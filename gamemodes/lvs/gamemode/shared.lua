@@ -5,9 +5,9 @@ GM.Website = "https://discord.gg/BeVtn7uwNH"
 
 DeriveGamemode( "base" )
 
-function GM:Initialize()
-print("runs")
+include( "player_class/player_lvs.lua" )
 
+function GM:Initialize()
 	LVS.HudForceDefault = true
 	LVS.FreezeTeams = true
 	LVS.TeamPassenger = true
