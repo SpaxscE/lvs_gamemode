@@ -1,0 +1,9 @@
+"lvs"
+{
+	"base"		"base"
+	"title"		"LVS-Tournament"
+	"maps"		"^lvs"
+	"category"	"pvp"
+	"menusystem"	"1"
+	//"workshopid"	""
+}
