@@ -1,6 +1,6 @@
 "lvs"
 {
-	"base"		"sandbox"
+	"base"		"base"
 	"title"		"LVS-Tournament"
 	"maps"		"^lvs"
 	"category"	"pvp"

@@ -3,7 +3,7 @@ GM.Author = "Luna"
 GM.Email = "juliewerding@gmx.de"
 GM.Website = "https://discord.gg/BeVtn7uwNH"
 
-DeriveGamemode( "sandbox" )
+DeriveGamemode( "base" )
 
 function GM:Initialize()
 print("runs")
