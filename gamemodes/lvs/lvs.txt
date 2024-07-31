@@ -5,5 +5,5 @@
 	"maps"		"^lvs"
 	"category"	"pvp"
 	"menusystem"	"1"
-	//"workshopid"	""
+	"workshopid"	"2912816023"
 }
