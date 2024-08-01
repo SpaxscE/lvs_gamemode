@@ -43,19 +43,17 @@ end
 
 function SWEP:PrimaryAttack()
 	self:SendWeaponAnim( ACT_SLAM_DETONATOR_DETONATE )
+
+	self:EmitSound("buttons/button14.wav")
 end
 
 function SWEP:SecondaryAttack()
 	self:SendWeaponAnim( ACT_SLAM_DETONATOR_DETONATE )
+
+	self:EmitSound("buttons/button18.wav")
 end
 
-function SWEP:Think()
-end
-
-function SWEP:OnRemove()
-end
-
-function SWEP:OnDrop()
+function SWEP:Reload()
 end
 
 function SWEP:Deploy()
@@ -64,6 +62,50 @@ function SWEP:Deploy()
 	return true
 end
 
+if SERVER then
+	function SWEP:Holster( wep )
+		return true
+	end
+
+	function SWEP:OnRemove()
+	end
+
+	function SWEP:OnDrop()
+	end
+
+	return
+end
+
+function SWEP:CalcMenu( Open )
+	if self._oldOpen == Open then return end
+
+	self._oldOpen = Open
+
+	if Open then
+		GAMEMODE:OpenBuyMenu()
+	else
+		GAMEMODE:CloseBuyMenu()
+	end
+end
+
+function SWEP:Think()
+	local ply = self:GetOwner()
+
+	if not IsValid( ply ) then return end
+
+	self:CalcMenu( ply:KeyDown( IN_RELOAD ) )
+end
+
 function SWEP:Holster( wep )
+	self:CalcMenu( false )
+
 	return true
+end
+
+function SWEP:OnRemove()
+	self:CalcMenu( false )
+end
+
+function SWEP:OnDrop()
+	self:CalcMenu( false )
 end
