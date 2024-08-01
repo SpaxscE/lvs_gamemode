@@ -45,6 +45,8 @@ local function BuildBuyMenu()
 			DButton:SetText( Vehicles[ i ] )
 			DButton:Dock( TOP )
 			DButton:DockMargin( 0, 0, 0, 5 )
+			--https://wiki.facepunch.com/gmod/ContentIcon
+			--https://wiki.facepunch.com/gmod/DTileLayout
 		end
 	end
 
