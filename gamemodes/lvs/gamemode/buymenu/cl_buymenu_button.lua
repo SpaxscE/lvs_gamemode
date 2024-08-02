@@ -61,7 +61,11 @@ function PANEL:SetMaterial( name )
 end
 
 function PANEL:DoClick()
-	--PrintChat( self:GetClassName() )
+	GAMEMODE:CloseBuyMenu()
+
+	net.Start( "lvs_buymenu" )
+		net.WriteString( self:GetClassName() )
+	net.SendToServer()
 end
 
 function PANEL:DoRightClick()

@@ -1,3 +1,3 @@
 include( "shared.lua" )
-include( "buymenu/buymenu.lua" )
-include( "buymenu/buymenu_button.lua" )
+include( "buymenu/cl_buymenu.lua" )
+include( "buymenu/cl_buymenu_button.lua" )

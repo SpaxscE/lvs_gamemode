@@ -15,9 +15,3 @@ function GM:Initialize()
 	cvars.RemoveChangeCallback( "lvs_freeze_teams", "lvs_freezeteams_callback" )
 	cvars.RemoveChangeCallback( "lvs_teampassenger", "lvs_teampassenger_callback" )
 end
-
-function GM:ShowSpare1( ply )
-end
-
-function GM:ShowSpare2( ply )
-end

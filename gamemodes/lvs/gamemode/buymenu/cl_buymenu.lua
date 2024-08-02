@@ -10,8 +10,18 @@ local function BuildBuyMenu()
 	BuyMenu:Center()
 	BuyMenu:SetTitle("")
 	BuyMenu:SetDraggable( false )
-	BuyMenu:ShowCloseButton( false )
-	BuyMenu:DockPadding(0,0,0,0)
+	--BuyMenu:ShowCloseButton( false )
+	BuyMenu:DockPadding(0,24,0,0)
+	BuyMenu.Paint = function(self, w, h )
+		draw.RoundedBox( 8, 0, 0, w, h, Color( 0, 0, 0, 255 ) )
+		draw.RoundedBoxEx( 8, 1, 26, w-2, h-27, Color( 120, 120, 120, 255 ), false, false, true, true )
+		draw.RoundedBoxEx( 8, 0, 0, w, 25, LVS.ThemeColor, true, true )
+
+		draw.SimpleText( "[LVS] - Vehicle Store", "LVS_FONT", 5, 11, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER )
+	end
+	BuyMenu.OnClose = function( self )
+		gui.EnableScreenClicker( false )
+	end
 
 	local CategoryPanel = vgui.Create( "DPanel", BuyMenu )
 	CategoryPanel:SetSize(FrameX * 0.15,FrameY)
