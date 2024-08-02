@@ -6,6 +6,8 @@ net.Receive( "lvs_buymenu", function( len, ply )
 
 	ply:EmitSound("lvs/tournament/store_buy.wav")
 
+	--TODO: add valid check
+	--TODO: money system
 	ply:lvsSetCurrentVehicle( class )
 end )
 
