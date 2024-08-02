@@ -75,6 +75,10 @@ if CLIENT then
 
 		if not ply:KeyDown( IN_RELOAD ) then return end
 
+		local Vehicle = self:GetVehicle()
+
+		if not IsValid( Vehicle ) or (ply:GetPos() - Vehicle:GetPos()):Length() > self.RemoveDistance then return end
+
 		local TimeLeft = math.Round( self:GetVehicleRemoveTime() - CurTime(), 0 )
 
 		if TimeLeft < 0 then return end
@@ -156,6 +160,8 @@ function SWEP:PrimaryAttack()
 	if not IsValid( ply._SpawnedVehicle ) then return end
 
 	ply:lvsRemoveCurrentVehicle()
+
+	self:SetVehicleRemoveTime( CurTime() + self.RemoveTime )
 
 	self:SetVehicle( ply._SpawnedVehicle )
 
