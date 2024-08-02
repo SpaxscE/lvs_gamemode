@@ -6,10 +6,20 @@ ENT.Spawnable		= false
 ENT.AdminOnly		= false
 
 if SERVER then
-	function ENT:Initialize()	
-		self:SetModel( "models/items/item_item_crate.mdl" )
+	function ENT:Initialize()
 		self:PhysicsInit( SOLID_VPHYSICS )
-		self:PhysWake()
+		self:SetMoveType( MOVETYPE_VPHYSICS )
+		self:SetSolid( SOLID_VPHYSICS )
+
+		local PObj = self:GetPhysicsObject()
+
+		if not IsValid( PObj ) then 
+			self:Remove()
+
+			return
+		end
+
+		PObj:EnableMotion( false )
 	end
 
 	function ENT:Think()
