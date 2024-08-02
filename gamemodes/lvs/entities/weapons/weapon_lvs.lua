@@ -16,10 +16,14 @@ SWEP.Primary.Ammo			= "none"
 
 SWEP.Secondary.ClipSize		= -1
 SWEP.Secondary.DefaultClip	= -1
-SWEP.Secondary.Automatic		= false
+SWEP.Secondary.Automatic		= true
 SWEP.Secondary.Ammo		= "none"
 
+SWEP.RemoveTime = 2
+
 function SWEP:SetupDataTables()
+	self:NetworkVar( "Float", 1, "VehicleRemoveTime" )
+	self:NetworkVar( "Entity", 1, "Vehicle" )
 end
 
 if CLIENT then
@@ -29,12 +33,54 @@ if CLIENT then
 	SWEP.Slot				= 4
 	SWEP.SlotPos			= 1
 
-	--SWEP.Purpose			= "Spawn Your LVS Vehicle"
-	--SWEP.Instructions		= "Primary to Spawn"
+	SWEP.Purpose			= "Spawn Your LVS Vehicle"
+	SWEP.Instructions		= "Right Click to Open Store, Left Click to Spawn, Reload to Remove"
 
-	SWEP.DrawWeaponInfoBox 	= false
+	SWEP.DrawWeaponInfoBox 	= true
 
 	--SWEP.WepSelectIcon 			= surface.GetTextureID( "weapons/lvsrepair" )
+
+	local circles = include("includes/circles/circles.lua")
+
+	local Circle = circles.New(CIRCLE_OUTLINED, 30, 0, 0, 5)
+	Circle:SetColor( color_white )
+	Circle:SetX( ScrW() * 0.5 )
+	Circle:SetY( ScrH() * 0.5 )
+	Circle:SetStartAngle( 0 )
+	Circle:SetEndAngle( 0 )
+
+	local ColorText = Color(255,255,255,255)
+
+	local function DrawText( x, y, text, col )
+		local font = "TargetIDSmall"
+
+		draw.DrawText( text, font, x + 1, y + 1, Color( 0, 0, 0, 120 ), TEXT_ALIGN_CENTER )
+		draw.DrawText( text, font, x + 2, y + 2, Color( 0, 0, 0, 50 ), TEXT_ALIGN_CENTER )
+		draw.DrawText( text, font, x, y, col or color_white, TEXT_ALIGN_CENTER )
+	end
+
+	function SWEP:DrawHUD()
+		local ply = LocalPlayer()
+
+		if ply:InVehicle() and not ply:GetAllowWeaponsInVehicle() then return end
+
+		if not ply:KeyDown( IN_RELOAD ) then return end
+
+		local RemoveTime = (self:GetVehicleRemoveTime() - CurTime()) / self.RemoveTime
+
+		if RemoveTime < 0 then return end
+
+		local X = ScrW() * 0.5
+		local Y = ScrH() * 0.5
+
+		Circle:SetX( X )
+		Circle:SetY( Y )
+		Circle:SetStartAngle( -360 * RemoveTime )
+		Circle:SetEndAngle( 0 )
+		Circle()
+
+		DrawText( X, Y + 34, "Removing Vehicle..." )
+	end
 end
 
 function SWEP:Initialize()
@@ -44,38 +90,27 @@ end
 function SWEP:PrimaryAttack()
 	self:SendWeaponAnim( ACT_SLAM_DETONATOR_DETONATE )
 
-	self:EmitSound("buttons/button14.wav")
-
-	if CLIENT then return end
-
 	local ply = self:GetOwner()
 
 	if not IsValid( ply ) then return end
 
-	if IsValid( ply._SpawnedVehicle ) then
-		ply._SpawnedVehicle:Remove()
+	if IsValid( self:GetVehicle() ) then
+		ply:EmitSound("buttons/button10.wav")
+
+		return
+	else
+		ply:EmitSound("buttons/button14.wav")
 	end
+
+	if CLIENT then return end
 
 	ply._SpawnedVehicle = GAMEMODE:SpawnVehicle( ply, ply:lvsGetCurrentVehicle(), tr )
 
-	self:EnterVehicle( ply._SpawnedVehicle )
+	self:SetVehicle( ply._SpawnedVehicle )
 end
 
 function SWEP:SecondaryAttack()
 	self:SendWeaponAnim( ACT_SLAM_DETONATOR_DETONATE )
-
-	self:EmitSound("buttons/button18.wav")
-
-	if CLIENT then return end
-
-	local ply = self:GetOwner()
-
-	if not IsValid( ply ) then return end
-
-	if IsValid( ply._SpawnedVehicle ) then
-		ply._SpawnedVehicle:Remove()
-	end
-
 end
 
 function SWEP:Reload()
@@ -84,10 +119,44 @@ end
 function SWEP:Deploy()
 	self:SendWeaponAnim( ACT_SLAM_DETONATOR_DRAW )
 
+	local ply = self:GetOwner()
+
+	if IsValid( ply ) and IsValid( ply._SpawnedVehicle ) then
+		self:SetVehicle( ply._SpawnedVehicle )
+	end
+
 	return true
 end
 
 if SERVER then
+	function SWEP:Think()
+		local ply = self:GetOwner()
+
+		if not IsValid( ply ) then return end
+
+		local Reload = ply:KeyDown( IN_RELOAD )
+
+		local Vehicle = self:GetVehicle()
+
+		if self._oldReload ~= Reload then
+			self._oldReload = Reload
+
+			if Reload and IsValid( Vehicle ) then
+				self:SetVehicleRemoveTime( CurTime() + self.RemoveTime )
+			end
+		end
+
+		if not Reload or not IsValid( Vehicle ) then return end
+
+		local RemoveTime = (self:GetVehicleRemoveTime() - CurTime()) / self.RemoveTime
+
+		if RemoveTime > 0 then return end
+
+		ply:EmitSound("buttons/button15.wav")
+
+		Vehicle:Remove()
+	end
+
 	function SWEP:EnterVehicle( vehicle )
 		local ply = self:GetOwner()
 
@@ -136,7 +205,7 @@ function SWEP:Think()
 
 	if not IsValid( ply ) then return end
 
-	self:CalcMenu( ply:KeyDown( IN_RELOAD ) )
+	self:CalcMenu( ply:KeyDown( IN_ATTACK2 ) )
 end
 
 function SWEP:Holster( wep )
