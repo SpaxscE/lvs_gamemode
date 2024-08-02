@@ -157,6 +157,51 @@ if CLIENT then
 	function SWEP:OnDrop()
 		self:GetPreviewGhost():SetNoDraw( false )
 	end
+else
+	function SWEP:Think()
+		local target = self:GetTrace().Entity
+
+		if not IsValid( target ) or not target.IsFortification then return end
+
+		local ply = self:GetOwner()
+
+		if not IsValid( ply ) then return end
+
+		local Reload = ply:KeyDown( IN_RELOAD )
+
+		if self._oldReload == Reload then return end
+
+		self._oldReload = Reload
+
+		if not Reload then return end
+
+		if target:GetCreatedBy() ~= ply then return end
+
+		if SERVER then
+			target:Remove()
+		end
+
+		self:SendWeaponAnim( ACT_VM_PRIMARYATTACK )
+
+		ply:SetAnimation( PLAYER_ATTACK1 )
+	end
+
+	function SWEP:Deploy()
+		self:SendWeaponAnim( ACT_VM_DEPLOY )
+
+		return true
+	end
+
+	function SWEP:Holster( wep )
+
+		return true
+	end
+
+	function SWEP:OnRemove()
+	end
+
+	function SWEP:OnDrop()
+	end
 end
 
 function SWEP:Initialize()
@@ -211,8 +256,6 @@ function SWEP:SecondaryAttack()
 
 			break
 		end
-
-		self:GetOwner():ChatPrint( self:GetItem() )
 	end
 end
 
