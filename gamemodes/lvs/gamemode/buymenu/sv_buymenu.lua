@@ -136,8 +136,6 @@ function GM:SpawnVehicle( ply, EntityName, tr )
 		entity:Spawn()
 		entity:Activate()
 
-		DoPropSpawnedEffect( entity )
-
 		if EntTable.DropToFloor then
 			entity:DropToFloor()
 		end
