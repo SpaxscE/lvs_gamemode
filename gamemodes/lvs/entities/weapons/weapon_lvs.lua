@@ -19,11 +19,22 @@ SWEP.Secondary.DefaultClip	= -1
 SWEP.Secondary.Automatic		= true
 SWEP.Secondary.Ammo		= "none"
 
+SWEP.RemoveDistance = 512
 SWEP.RemoveTime = 2
 
 function SWEP:SetupDataTables()
 	self:NetworkVar( "Float", 1, "VehicleRemoveTime" )
 	self:NetworkVar( "Entity", 1, "Vehicle" )
+end
+
+function SWEP:GetTrace()
+	local ply = self:GetOwner()
+
+	if not IsValid( ply ) then return end
+
+	local trace = ply:GetEyeTrace()
+
+	return trace
 end
 
 if CLIENT then
@@ -66,12 +77,22 @@ if CLIENT then
 
 		if not ply:KeyDown( IN_RELOAD ) then return end
 
+		local Vehicle = self:GetVehicle()
+
+		local X = ScrW() * 0.5
+		local Y = ScrH() * 0.5
+
+		if not IsValid( Vehicle ) then DrawText( X, Y + 34, "!No Vehicle!", Color(255,0,0,255) ) return end
+
+		if (ply:GetPos() - Vehicle:GetPos()):Length() > self.RemoveDistance then DrawText( X, Y + 34, "!Vehicle too far away!", Color(255,0,0, math.abs( math.cos( CurTime() * 5 ) ) * 255 ) ) return end
+
+		if #Vehicle:GetEveryone() > 0 then DrawText( X, Y + 34, "!Vehicle is in use!", Color(255,0,0, math.abs( math.cos( CurTime() * 5 ) ) * 255 ) ) return end
+
 		local RemoveTime = (self:GetVehicleRemoveTime() - CurTime()) / self.RemoveTime
 
 		if RemoveTime < 0 then return end
 
-		local X = ScrW() * 0.5
-		local Y = ScrH() * 0.5
+		draw.NoTexture()
 
 		Circle:SetX( X )
 		Circle:SetY( Y )
@@ -95,6 +116,10 @@ function SWEP:PrimaryAttack()
 	if not IsValid( ply ) then return end
 
 	if IsValid( self:GetVehicle() ) then
+		if SERVER then
+			ply:ChatPrint( "You already have a Vehicle! Hold Reload to Remove it!" )
+		end
+
 		ply:EmitSound("buttons/button10.wav")
 
 		return
@@ -104,7 +129,11 @@ function SWEP:PrimaryAttack()
 
 	if CLIENT then return end
 
-	ply._SpawnedVehicle = GAMEMODE:SpawnVehicle( ply, ply:lvsGetCurrentVehicle(), tr )
+	local trace = self:GetTrace()
+
+	if not trace then return end
+
+	ply._SpawnedVehicle = GAMEMODE:SpawnVehicle( ply, ply:lvsGetCurrentVehicle(), trace )
 
 	self:SetVehicle( ply._SpawnedVehicle )
 end
@@ -138,10 +167,21 @@ if SERVER then
 
 		local Vehicle = self:GetVehicle()
 
+		if Reload and IsValid( Vehicle ) then
+			if #Vehicle:GetEveryone() > 0 then
+				Reload = false
+			end
+
+			if (ply:GetPos() - Vehicle:GetPos()):Length() > self.RemoveDistance then
+				Reload = false
+			end
+		end
+
 		if self._oldReload ~= Reload then
 			self._oldReload = Reload
 
 			if Reload and IsValid( Vehicle ) then
+				self._NotifyPlayed = nil
 				self:SetVehicleRemoveTime( CurTime() + self.RemoveTime )
 			end
 		end
@@ -153,6 +193,8 @@ if SERVER then
 		if RemoveTime > 0 then return end
 
 		ply:EmitSound("buttons/button15.wav")
+
+		ply:ChatPrint( "Vehicle Removed" )
 
 		Vehicle:Remove()
 	end
