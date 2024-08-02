@@ -5,6 +5,12 @@ ENT.Type            = "anim"
 ENT.Spawnable		= false
 ENT.AdminOnly		= false
 
+ENT.IsFortification = true
+
+function ENT:SetupDataTables()
+	self:NetworkVar( "Entity",1, "CreatedBy" )
+end
+
 if SERVER then
 	function ENT:Initialize()
 		self:PhysicsInit( SOLID_VPHYSICS )

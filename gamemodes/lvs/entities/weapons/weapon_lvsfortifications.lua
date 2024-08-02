@@ -69,6 +69,26 @@ function SWEP:SetupDataTables()
 	end
 end
 
+function SWEP:GetObjectList()
+	if istable( self._ObjectList ) then return self._ObjectList end
+
+	self._ObjectList = list.Get( "Fortifications" )
+
+	return self._ObjectList
+end
+
+function SWEP:GetCurrentObject()
+	return self:GetObjectList()[ self:GetItem() ]
+end
+
+function SWEP:GetTrace()
+	local ply = self:GetOwner()
+
+	if not IsValid( ply ) then return end
+
+	return ply:GetEyeTrace()
+end
+
 if CLIENT then
 	SWEP.PrintName		= "Fortifications"
 	SWEP.Author			= "Luna"
@@ -82,6 +102,61 @@ if CLIENT then
 	SWEP.DrawWeaponInfoBox 	= true
 
 	--SWEP.WepSelectIcon 			= surface.GetTextureID( "weapons/lvsrepair" )
+
+	function SWEP:GetPreviewGhost()
+		if IsValid( PreviewGhost ) then
+			return PreviewGhost
+		end
+
+		PreviewGhost = ClientsideModel( "models/error.mdl" )
+		PreviewGhost:SetMaterial( "lights/white" )
+		PreviewGhost:SetRenderMode( RENDERMODE_TRANSCOLOR )
+		PreviewGhost:SetNoDraw( true )
+
+		return PreviewGhost
+	end
+
+	function SWEP:Think()
+		local Object = self:GetCurrentObject()
+		local ply = self:GetOwner()
+
+		if not IsValid( ply ) or not Object then return end
+
+		if not Object.Model or Object.Model == "" then return end
+
+		local Ghost = self:GetPreviewGhost()
+
+		if Ghost:GetModel() ~= Object.Model then
+			Ghost:SetModel( Object.Model )
+			Ghost:SetNoDraw( false )
+			Ghost:SetColor( Color(255,255,255,150) )
+		end
+
+		Ghost:SetPos( self:GetTrace().HitPos )
+		Ghost:SetAngles( Angle(0, ply:EyeAngles().y, 0 ) )
+	end
+
+	function SWEP:Deploy()
+		self:SendWeaponAnim( ACT_VM_DEPLOY )
+
+		self:GetPreviewGhost():SetNoDraw( false )
+
+		return true
+	end
+
+	function SWEP:Holster( wep )
+		self:GetPreviewGhost():SetNoDraw( true )
+
+		return true
+	end
+
+	function SWEP:OnRemove()
+		self:GetPreviewGhost():SetNoDraw( true )
+	end
+
+	function SWEP:OnDrop()
+		self:GetPreviewGhost():SetNoDraw( false )
+	end
 end
 
 function SWEP:Initialize()
@@ -96,14 +171,20 @@ function SWEP:PrimaryAttack()
 	if not IsValid( ply ) then return end
 
 	ply:SetAnimation( PLAYER_ATTACK1 )
-end
 
-function SWEP:GetObjectList()
-	if istable( self._ObjectList ) then return self._ObjectList end
+	if CLIENT then return end
 
-	self._ObjectList = list.Get( "Fortifications" )
+	local Object = self:GetCurrentObject()
 
-	return self._ObjectList
+	if not Object or not Object.Class or not Object.Model or Object.Model == "" then return end
+
+	local Ent = ents.Create( Object.Class )
+	Ent:SetModel( Object.Model )
+	Ent:SetPos( self:GetTrace().HitPos )
+	Ent:SetAngles( Angle(0, ply:EyeAngles().y, 0 ) )
+	Ent:Spawn()
+	Ent:Activate()
+	Ent:SetCreatedBy( ply )
 end
 
 function SWEP:SecondaryAttack()
@@ -136,23 +217,4 @@ function SWEP:SecondaryAttack()
 end
 
 function SWEP:Reload()
-end
-
-function SWEP:Deploy()
-	self:SendWeaponAnim( ACT_VM_DEPLOY )
-
-	return true
-end
-
-function SWEP:Think()
-end
-
-function SWEP:Holster( wep )
-	return true
-end
-
-function SWEP:OnRemove()
-end
-
-function SWEP:OnDrop()
 end
