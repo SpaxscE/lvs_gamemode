@@ -18,8 +18,8 @@ local function DrawPlayerHud( X, Y, ply )
 
 	local ColArmor = (Armor <= 20) and ColorLow or ColorNormal
 
-	draw.DrawText( "ARMOR ", "LVS_FONT", X + 255, Y + 35, ColArmor, TEXT_ALIGN_RIGHT )
-	draw.DrawText( Armor, "LVS_FONT_HUD_LARGE", X + 255, Y + 20, ColArmor, TEXT_ALIGN_LEFT )
+	draw.DrawText( "ARMOR ", "LVS_FONT", X + 265, Y + 35, ColArmor, TEXT_ALIGN_RIGHT )
+	draw.DrawText( Armor, "LVS_FONT_HUD_LARGE", X + 265, Y + 20, ColArmor, TEXT_ALIGN_LEFT )
 end
 
 local function PlayerHud()
