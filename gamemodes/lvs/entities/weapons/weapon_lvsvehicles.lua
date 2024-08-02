@@ -88,7 +88,7 @@ if CLIENT then
 
 		if #Vehicle:GetEveryone() > 0 then DrawText( X, Y + 34, "!Vehicle is in use!", Color(255,0,0, math.abs( math.cos( CurTime() * 5 ) ) * 255 ) ) return end
 
-		local RemoveTime = (self:GetVehicleRemoveTime() - CurTime()) / self.RemoveTime
+		local RemoveTime = math.min( (self:GetVehicleRemoveTime() - CurTime()) / self.RemoveTime, 1 )
 
 		if RemoveTime < 0 then return end
 
@@ -120,11 +120,15 @@ function SWEP:PrimaryAttack()
 			ply:ChatPrint( "You already have a Vehicle!" )
 		end
 
-		ply:EmitSound("buttons/button10.wav")
+		if CLIENT and IsFirstTimePredicted() then
+			ply:EmitSound("buttons/button10.wav")
+		end
 
 		return
 	else
-		ply:EmitSound("buttons/button14.wav")
+		if CLIENT and IsFirstTimePredicted() then
+			ply:EmitSound("buttons/button14.wav")
+		end
 	end
 
 	if CLIENT then return end
@@ -134,6 +138,8 @@ function SWEP:PrimaryAttack()
 	if not trace then return end
 
 	ply._SpawnedVehicle = GAMEMODE:SpawnVehicle( ply, ply:lvsGetCurrentVehicle(), trace )
+
+	if not IsValid( ply._SpawnedVehicle ) then return end
 
 	self:SetVehicle( ply._SpawnedVehicle )
 
@@ -159,46 +165,52 @@ function SWEP:Deploy()
 	return true
 end
 
-if SERVER then
-	function SWEP:Think()
-		local ply = self:GetOwner()
+function SWEP:HandleVehicleRemove()
+	local ply = self:GetOwner()
 
-		if not IsValid( ply ) then return end
+	if not IsValid( ply ) then return end
 
-		local Reload = ply:KeyDown( IN_RELOAD )
+	local Reload = ply:KeyDown( IN_RELOAD )
 
-		local Vehicle = self:GetVehicle()
+	local Vehicle = self:GetVehicle()
+
+	if Reload and IsValid( Vehicle ) and isfunction( Vehicle.GetEveryone ) then
+		if #Vehicle:GetEveryone() > 0 then
+			Reload = false
+		end
+
+		if (ply:GetPos() - Vehicle:GetPos()):Length() > self.RemoveDistance then
+			Reload = false
+		end
+	end
+
+	if self._oldReload ~= Reload then
+		self._oldReload = Reload
 
 		if Reload and IsValid( Vehicle ) then
-			if #Vehicle:GetEveryone() > 0 then
-				Reload = false
-			end
-
-			if (ply:GetPos() - Vehicle:GetPos()):Length() > self.RemoveDistance then
-				Reload = false
-			end
+			self._NotifyPlayed = nil
+			self:SetVehicleRemoveTime( CurTime() + self.RemoveTime )
 		end
+	end
 
-		if self._oldReload ~= Reload then
-			self._oldReload = Reload
+	if not Reload or not IsValid( Vehicle ) then return end
 
-			if Reload and IsValid( Vehicle ) then
-				self._NotifyPlayed = nil
-				self:SetVehicleRemoveTime( CurTime() + self.RemoveTime )
-			end
-		end
+	local RemoveTime = (self:GetVehicleRemoveTime() - CurTime()) / self.RemoveTime
 
-		if not Reload or not IsValid( Vehicle ) then return end
+	if RemoveTime > 0 then return end
 
-		local RemoveTime = (self:GetVehicleRemoveTime() - CurTime()) / self.RemoveTime
+	if CLIENT then return end
 
-		if RemoveTime > 0 then return end
+	ply:EmitSound("buttons/button15.wav")
 
-		ply:EmitSound("buttons/button15.wav")
+	ply:ChatPrint( "Vehicle Removed" )
 
-		ply:ChatPrint( "Vehicle Removed" )
+	Vehicle:Remove()
+end
 
-		Vehicle:Remove()
+if SERVER then
+	function SWEP:Think()
+		self:HandleVehicleRemove()
 	end
 
 	function SWEP:EnterVehicle( vehicle )
@@ -245,6 +257,8 @@ function SWEP:CalcMenu( Open )
 end
 
 function SWEP:Think()
+	self:HandleVehicleRemove()
+
 	local ply = self:GetOwner()
 
 	if not IsValid( ply ) then return end
