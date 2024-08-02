@@ -37,7 +37,8 @@ function PLAYER:Loadout()
 
 	self.Player:RemoveAllAmmo()
 
-	self.Player:Give( "weapon_lvs" )
+	self.Player:Give( "weapon_lvsfortifications" )
+	self.Player:Give( "weapon_lvsvehicles" )
 	self.Player:Give( "weapon_lvsrepair" )
 
 	self.Player:SwitchToDefaultWeapon()
