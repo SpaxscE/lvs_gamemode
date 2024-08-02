@@ -45,12 +45,35 @@ function SWEP:PrimaryAttack()
 	self:SendWeaponAnim( ACT_SLAM_DETONATOR_DETONATE )
 
 	self:EmitSound("buttons/button14.wav")
+
+	if CLIENT then return end
+
+	local ply = self:GetOwner()
+
+	if not IsValid( ply ) then return end
+
+	if IsValid( ply._SpawnedVehicle ) then
+		ply._SpawnedVehicle:Remove()
+	end
+
+	ply._SpawnedVehicle = GAMEMODE:SpawnVehicle( ply, ply:lvsGetCurrentVehicle(), tr )
 end
 
 function SWEP:SecondaryAttack()
 	self:SendWeaponAnim( ACT_SLAM_DETONATOR_DETONATE )
 
 	self:EmitSound("buttons/button18.wav")
+
+	if CLIENT then return end
+
+	local ply = self:GetOwner()
+
+	if not IsValid( ply ) then return end
+
+	if IsValid( ply._SpawnedVehicle ) then
+		ply._SpawnedVehicle:Remove()
+	end
+
 end
 
 function SWEP:Reload()
