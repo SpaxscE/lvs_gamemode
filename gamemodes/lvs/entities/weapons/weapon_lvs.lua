@@ -57,6 +57,8 @@ function SWEP:PrimaryAttack()
 	end
 
 	ply._SpawnedVehicle = GAMEMODE:SpawnVehicle( ply, ply:lvsGetCurrentVehicle(), tr )
+
+	self:EnterVehicle( ply._SpawnedVehicle )
 end
 
 function SWEP:SecondaryAttack()
@@ -86,6 +88,24 @@ function SWEP:Deploy()
 end
 
 if SERVER then
+	function SWEP:EnterVehicle( vehicle )
+		local ply = self:GetOwner()
+
+		if not IsValid( vehicle ) or not IsValid( ply ) then return end
+
+		if not vehicle:IsInitialized() then
+			timer.Simple( 0, function()
+				if not IsValid( self ) then return end
+
+				self:EnterVehicle( vehicle )
+			end )
+
+			return
+		end
+
+		vehicle:SetPassenger( ply )
+	end
+
 	function SWEP:Holster( wep )
 		return true
 	end
