@@ -199,6 +199,8 @@ function SWEP:HandleVehicleRemove()
 
 	if RemoveTime > 0 then return end
 
+	self:SendWeaponAnim( ACT_SLAM_DETONATOR_DETONATE )
+
 	if CLIENT then return end
 
 	ply:EmitSound("buttons/button15.wav")
