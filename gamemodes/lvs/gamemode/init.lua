@@ -1,6 +1,7 @@
 include( "shared.lua" )
 include( "buymenu/sv_buymenu.lua" )
 AddCSLuaFile( "cl_init.lua" )
+AddCSLuaFile( "cl_hud.lua" )
 AddCSLuaFile( "buymenu/cl_buymenu.lua" )
 AddCSLuaFile( "buymenu/cl_buymenu_button.lua" )
 AddCSLuaFile( "shared.lua" )
