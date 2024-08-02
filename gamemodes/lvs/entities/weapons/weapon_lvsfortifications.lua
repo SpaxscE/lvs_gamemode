@@ -61,6 +61,12 @@ models/props_fortifications/sandbag.mdl
 ]]
 
 function SWEP:SetupDataTables()
+	self:NetworkVar( "Int", 1, "NumIndex" )
+	self:NetworkVar( "String", 1, "Item" )
+
+	if SERVER then
+		self:SetNumIndex( 1 )
+	end
 end
 
 if CLIENT then
@@ -90,11 +96,43 @@ function SWEP:PrimaryAttack()
 	if not IsValid( ply ) then return end
 
 	ply:SetAnimation( PLAYER_ATTACK1 )
+end
 
-	if SERVER then PrintChat( list.Get( "Fortifications" ) ) end
+function SWEP:GetObjectList()
+	if istable( self._ObjectList ) then return self._ObjectList end
+
+	self._ObjectList = list.Get( "Fortifications" )
+
+	return self._ObjectList
 end
 
 function SWEP:SecondaryAttack()
+	self:EmitSound( "Weapon_Pistol.Empty" )
+
+	if SERVER then
+		local objects = self:GetObjectList()
+
+		self:SetNumIndex( self:GetNumIndex() + 1 )
+
+		if self:GetNumIndex() > table.Count( objects ) then
+			self:SetNumIndex( 1 )
+		end
+
+		local desired = self:GetNumIndex()
+		local index = 0
+
+		for name, _ in pairs( objects ) do
+			index = index + 1
+
+			if index ~= desired then continue end
+
+			self:SetItem( name )
+
+			break
+		end
+
+		self:GetOwner():ChatPrint( self:GetItem() )
+	end
 end
 
 function SWEP:Reload()
