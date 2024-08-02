@@ -195,6 +195,31 @@ local function BuildBuyMenu()
 		end
 	end
 
+	-- CONTROLS
+	local node = lvsNode:AddNode( "Controls", "icon16/keyboard.png" )
+	node.DoClick = function( self )
+		LVS:OpenMenu()
+		LVS:OpenClientControls()
+	end
+
+	-- CLIENT SETTINGS
+	local node = lvsNode:AddNode( "Client Settings", "icon16/wrench.png" )
+	node.DoClick = function( self )
+		LVS:OpenMenu()
+		LVS:OpenClientSettings()
+	end
+
+	-- SERVER SETTINGS
+	local node = lvsNode:AddNode( "Server Settings", "icon16/wrench_orange.png" )
+	node.DoClick = function( self )
+		if LocalPlayer():IsSuperAdmin() then
+			LVS:OpenMenu()
+			LVS:OpenServerMenu()
+		else
+			surface.PlaySound( "buttons/button11.wav" )
+		end
+	end
+
 	return BuyMenu
 end
 

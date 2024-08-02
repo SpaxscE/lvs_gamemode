@@ -60,10 +60,11 @@ function PANEL:SetMaterial( name )
 	self.Image:SetMaterial( mat )
 end
 
-function PANEL:DoRightClick()
+function PANEL:DoClick()
+	--PrintChat( self:GetClassName() )
 end
 
-function PANEL:DoClick()
+function PANEL:DoRightClick()
 end
 
 function PANEL:OpenMenu()
