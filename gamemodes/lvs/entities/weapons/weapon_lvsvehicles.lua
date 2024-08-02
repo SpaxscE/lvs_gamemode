@@ -20,7 +20,7 @@ SWEP.Secondary.Automatic		= true
 SWEP.Secondary.Ammo		= "none"
 
 SWEP.RemoveDistance = 512
-SWEP.RemoveTime = 2
+SWEP.RemoveTime = 15
 
 function SWEP:SetupDataTables()
 	self:NetworkVar( "Float", 1, "VehicleRemoveTime" )
@@ -68,6 +68,20 @@ if CLIENT then
 		draw.DrawText( text, font, x + 1, y + 1, Color( 0, 0, 0, 120 ), TEXT_ALIGN_CENTER )
 		draw.DrawText( text, font, x + 2, y + 2, Color( 0, 0, 0, 50 ), TEXT_ALIGN_CENTER )
 		draw.DrawText( text, font, x, y, col or color_white, TEXT_ALIGN_CENTER )
+	end
+
+	function SWEP:DoDrawCrosshair( x, y )
+		local ply = LocalPlayer()
+
+		if not ply:KeyDown( IN_RELOAD ) then return end
+
+		local TimeLeft = math.Round( self:GetVehicleRemoveTime() - CurTime(), 0 )
+
+		if TimeLeft < 0 then return end
+
+		draw.DrawText( TimeLeft, "LVS_FONT_HUD_LARGE", x, y - 20, color_white, TEXT_ALIGN_CENTER )
+
+		return true
 	end
 
 	function SWEP:DrawHUD()
