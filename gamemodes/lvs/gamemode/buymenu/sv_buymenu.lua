@@ -21,6 +21,10 @@ function meta:lvsGetCurrentVehicle()
 	return self._lvsCurrentVehicle or ""
 end
 
+function meta:lvsRemoveCurrentVehicle()
+	self._lvsCurrentVehicle = nil
+end
+
 local function fixupProp( ply, ent, hitpos, mins, maxs )
 	local entPos = ent:GetPos()
 	local endposD = ent:LocalToWorld( mins )

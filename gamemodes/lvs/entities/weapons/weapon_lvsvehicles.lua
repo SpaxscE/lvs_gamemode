@@ -155,6 +155,8 @@ function SWEP:PrimaryAttack()
 
 	if not IsValid( ply._SpawnedVehicle ) then return end
 
+	ply:lvsRemoveCurrentVehicle()
+
 	self:SetVehicle( ply._SpawnedVehicle )
 
 	ply:ChatPrint( "Vehicle Spawned" )
@@ -220,6 +222,8 @@ function SWEP:HandleVehicleRemove()
 	ply:EmitSound("buttons/button15.wav")
 
 	ply:ChatPrint( "Vehicle Removed" )
+
+	ply:lvsSetCurrentVehicle( Vehicle:GetClass() )
 
 	Vehicle:Remove()
 end
