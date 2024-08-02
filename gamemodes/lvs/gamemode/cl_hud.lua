@@ -1,18 +1,25 @@
 
+local ColorNormal = color_white
+local ColorLow = Color(255,0,0,255)
+
 local function DrawPlayerHud( X, Y, ply )
 	if not ply:Alive() then return end
 
 	local Health = math.Round( ply:Health(), 0 )
 
-	draw.DrawText( "HEALTH ", "LVS_FONT", X + 102, Y + 35, color_white, TEXT_ALIGN_RIGHT )
-	draw.DrawText( Health, "LVS_FONT_HUD_LARGE", X + 102, Y + 20, color_white, TEXT_ALIGN_LEFT )
+	local ColHealth = (Health <= 20) and ColorLow or ColorNormal
+
+	draw.DrawText( "HEALTH ", "LVS_FONT", X + 102, Y + 35, ColHealth, TEXT_ALIGN_RIGHT )
+	draw.DrawText( Health, "LVS_FONT_HUD_LARGE", X + 102, Y + 20, ColHealth, TEXT_ALIGN_LEFT )
 
 	local Armor = math.Round( ply:Armor(), 0 )
 
 	if Armor <= 0 then return end
 
-	draw.DrawText( "ARMOR ", "LVS_FONT", X + 255, Y + 35, color_white, TEXT_ALIGN_RIGHT )
-	draw.DrawText( Armor, "LVS_FONT_HUD_LARGE", X + 255, Y + 20, color_white, TEXT_ALIGN_LEFT )
+	local ColArmor = (Armor <= 20) and ColorLow or ColorNormal
+
+	draw.DrawText( "ARMOR ", "LVS_FONT", X + 255, Y + 35, ColArmor, TEXT_ALIGN_RIGHT )
+	draw.DrawText( Armor, "LVS_FONT_HUD_LARGE", X + 255, Y + 20, ColArmor, TEXT_ALIGN_LEFT )
 end
 
 local function PlayerHud()
