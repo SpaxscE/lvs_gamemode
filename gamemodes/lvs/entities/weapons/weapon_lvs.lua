@@ -117,7 +117,7 @@ function SWEP:PrimaryAttack()
 
 	if IsValid( self:GetVehicle() ) then
 		if SERVER then
-			ply:ChatPrint( "You already have a Vehicle! Hold Reload to Remove it!" )
+			ply:ChatPrint( "You already have a Vehicle!" )
 		end
 
 		ply:EmitSound("buttons/button10.wav")
@@ -136,6 +136,8 @@ function SWEP:PrimaryAttack()
 	ply._SpawnedVehicle = GAMEMODE:SpawnVehicle( ply, ply:lvsGetCurrentVehicle(), trace )
 
 	self:SetVehicle( ply._SpawnedVehicle )
+
+	ply:ChatPrint( "Vehicle Spawned" )
 end
 
 function SWEP:SecondaryAttack()
