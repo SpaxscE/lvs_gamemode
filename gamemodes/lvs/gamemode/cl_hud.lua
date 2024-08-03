@@ -3,8 +3,6 @@ local ColorNormal = color_white
 local ColorLow = Color(255,0,0,255)
 
 local function DrawPlayerHud( X, Y, ply )
-	if not ply:Alive() then return end
-
 	local Health = math.Round( ply:Health(), 0 )
 
 	local ColHealth = (Health <= 20) and ColorLow or ColorNormal
@@ -22,10 +20,8 @@ local function DrawPlayerHud( X, Y, ply )
 	draw.DrawText( Armor, "LVS_FONT_HUD_LARGE", X + 265, Y + 20, ColArmor, TEXT_ALIGN_LEFT )
 end
 
-local function PlayerHud()
-	local ply = LocalPlayer()
-
-	if not IsValid( ply ) or ply:InVehicle() then return end
+function GM:PlayerHud( ply )
+	if ply:InVehicle() or not ply:Alive() then return end
 
 	local editor = LVS.HudEditors["VehicleHealth"]
 
@@ -59,8 +55,16 @@ local function PlayerHud()
 end
 
 function GM:HUDPaint()
+	local ply = LocalPlayer()
+
+	if not IsValid( ply ) then return end
+
 	if hook.Call( "HUDShouldDraw", self, "LVSHudHealth" ) then
-		PlayerHud()
+		self:PlayerHud( ply )
+	end
+
+	if hook.Call( "HUDShouldDraw", self, "LVSHudMoney" ) then
+		self:DrawPlayerMoney( ply )
 	end
 end
 

@@ -66,6 +66,8 @@ function PANEL:DoClick()
 	net.Start( "lvs_buymenu" )
 		net.WriteString( self:GetClassName() )
 	net.SendToServer()
+
+	surface.PlaySound( "ui/buttonclickrelease.wav" )
 end
 
 function PANEL:DoRightClick()
@@ -105,6 +107,8 @@ function PANEL:Paint( w, h )
 
 		surface.SetMaterial( matOverlay_Hovered )
 		self.Label:Hide()
+
+		LocalPlayer():CanAfford( GAMEMODE:GetVehiclePrice( self:GetClassName() ) )
 
 	else
 

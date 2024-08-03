@@ -6,6 +6,7 @@ AddCSLuaFile( "buymenu/cl_buymenu.lua" )
 AddCSLuaFile( "buymenu/cl_buymenu_button.lua" )
 AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "player_class/player_lvs.lua" )
+AddCSLuaFile( "sh_moneysystem.lua" )
 
 DEFINE_BASECLASS( "gamemode_base" )
 

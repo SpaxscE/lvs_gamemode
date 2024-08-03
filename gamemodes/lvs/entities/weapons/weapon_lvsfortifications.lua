@@ -23,24 +23,28 @@ list.Set("Fortifications", "sandbags", {
 	Name = "Sandbags",
 	Class = "lvs_fortification",
 	Model = "models/props_fortifications/sandbags_line1_tall.mdl",
+	Price = 50,
 })
 
 list.Set("Fortifications", "hedgehog", {
 	Name = "Hedgehog",
 	Class = "lvs_fortification",
 	Model = "models/props_fortifications/hedgehog_small1.mdl",
+	Price = 100,
 })
 
 list.Set("Fortifications", "dragonsteeth", {
 	Name = "Dragon's teeth",
 	Class = "lvs_fortification",
 	Model = "models/diggercars/props/dragonsteeth.mdl",
+	Price = 75,
 })
 
 list.Set("Fortifications", "wirefence", {
 	Name = "Wire Fence",
 	Class = "lvs_fortification",
 	Model = "models/diggercars/props/wire_test.mdl",
+	Price = 25,
 })
 
 --[[
@@ -134,6 +138,8 @@ if CLIENT then
 
 		Ghost:SetPos( self:GetTrace().HitPos )
 		Ghost:SetAngles( Angle(0, ply:EyeAngles().y, 0 ) )
+
+		ply:CanAfford( Object.Price )
 	end
 
 	function SWEP:Deploy()
@@ -222,6 +228,10 @@ function SWEP:PrimaryAttack()
 	local Object = self:GetCurrentObject()
 
 	if not Object or not Object.Class or not Object.Model or Object.Model == "" then return end
+
+	if not ply:CanAfford( Object.Price ) then return end
+
+	ply:TakeMoney( Object.Price )
 
 	local Ent = ents.Create( Object.Class )
 	Ent:SetModel( Object.Model )
