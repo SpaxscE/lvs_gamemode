@@ -40,7 +40,7 @@ list.Set("Fortifications", "sandbags", {
 		"physics/cardboard/cardboard_box_break3.wav",
 	},
 	Price = 15,
-	Health = 2000,
+	Health = 3000,
 })
 
 list.Set("Fortifications", "hedgehog", {
@@ -56,7 +56,7 @@ list.Set("Fortifications", "hedgehog", {
 		"physics/metal/metal_box_break1.wav",
 		"physics/metal/metal_box_break2.wav",
 	},
-	Health = 1000,
+	Health = 1500,
 	Price = 100,
 })
 
