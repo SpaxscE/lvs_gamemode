@@ -71,7 +71,11 @@ function SWEP:PrimaryAttack()
 
 	if not IsValid( ply ) then return end
 
-	if IsValid( ply:GetSpawnPoint() ) then return end
+	if IsValid( ply:GetSpawnPoint() ) then
+		ply:ChatPrint("Can not create another Spawnpoint!")
+
+		return
+	end
 
 	local StartPos = ply:GetShootPos()
 	local EndPos = StartPos - Vector(0,0,60000)
@@ -90,6 +94,8 @@ function SWEP:PrimaryAttack()
 	ent:SetOwner( ply )
 	ent:SetCreatedBy( ply )
 
+	ply:ChatPrint("Spawnpoint Set")
+
 	ply:SetSpawnPoint( ent )
 end
 
@@ -103,7 +109,10 @@ function SWEP:Reload()
 	if not IsValid( ply ) then return end
 
 	local oldSpawn = ply:GetSpawnPoint()
+
 	if IsValid( oldSpawn ) then
+		ply:ChatPrint("Spawnpoint Removed")
+
 		oldSpawn:Remove()
 	end
 end
