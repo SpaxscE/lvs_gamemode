@@ -235,6 +235,8 @@ local function BuildBuyMenu()
 end
 
 function GM:OpenBuyMenu()
+	if LocalPlayer():Team() == TEAM_SPECTATOR then return end
+
 	gui.EnableScreenClicker( true )
 
 	BuildBuyMenu():SetVisible( true )

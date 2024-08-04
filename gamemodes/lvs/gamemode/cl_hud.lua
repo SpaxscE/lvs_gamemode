@@ -57,7 +57,7 @@ end
 function GM:HUDPaint()
 	local ply = LocalPlayer()
 
-	if not IsValid( ply ) then return end
+	if not IsValid( ply ) or ply:Team() == TEAM_SPECTATOR then return end
 
 	if hook.Call( "HUDShouldDraw", self, "LVSHudHealth" ) then
 		self:PlayerHud( ply )

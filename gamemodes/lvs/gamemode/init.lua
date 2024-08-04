@@ -1,4 +1,5 @@
 include( "shared.lua" )
+include( "player.lua" )
 include( "buymenu/sv_buymenu.lua" )
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "cl_hud.lua" )
@@ -8,28 +9,7 @@ AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "player_class/player_lvs.lua" )
 AddCSLuaFile( "sh_moneysystem.lua" )
 AddCSLuaFile( "sh_vehicles.lua" )
-
-DEFINE_BASECLASS( "gamemode_base" )
-
-function GM:PlayerSpawn( pl, transiton )
-
-	player_manager.SetPlayerClass( pl, "player_lvs" )
-
-	BaseClass.PlayerSpawn( self, pl, transiton )
-
-end
-
-function GM:PlayerInitialSpawn( pl, transiton )
-
-	BaseClass.PlayerInitialSpawn( self, pl, transiton )
-
-	local ConVar = GetConVar( "lvs_start_money" )
-
-	if not ConVar then return end
-
-	pl:AddMoney( ConVar:GetInt() )
-
-end
+AddCSLuaFile( "sh_spectator.lua" )
 
 --F1
 function GM:ShowHelp( ply )

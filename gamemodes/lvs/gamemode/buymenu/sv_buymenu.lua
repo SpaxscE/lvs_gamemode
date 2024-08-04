@@ -46,11 +46,6 @@ function GM:SpawnVehicle( ply, EntityName, tr )
 
 	if EntityName == nil then return end
 
-	--if ( !CanPlayerSpawnSENT( ply, EntityName ) ) then return end
-
-	-- Ask the gamemode if it's OK to spawn this
-	--if ( !gamemode.Call( "PlayerSpawnSENT", ply, EntityName ) ) then return end
-
 	if not tr then
 
 		local vStart = ply:EyePos()
@@ -137,10 +132,6 @@ function GM:SpawnVehicle( ply, EntityName, tr )
 	if not IsValid( entity ) then return end
 
 	TryFixPropPosition( ply, entity, tr.HitPos )
-
-	--if ( IsValid( ply ) ) then
-	--	gamemode.Call( "PlayerSpawnedSENT", ply, entity )
-	--end
 
 	return entity
 end

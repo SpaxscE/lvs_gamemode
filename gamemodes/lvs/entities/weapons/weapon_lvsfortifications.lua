@@ -57,7 +57,7 @@ list.Set("Fortifications", "hedgehog", {
 		"physics/metal/metal_box_break2.wav",
 	},
 	Health = 1000,
-	Price = 75,
+	Price = 100,
 })
 
 list.Set("Fortifications", "dragonsteeth", {
@@ -78,7 +78,7 @@ list.Set("Fortifications", "dragonsteeth", {
 		"physics/concrete/boulder_impact_hard3.wav",
 		"physics/concrete/boulder_impact_hard4.wav",
 	},
-	Health = 3000,
+	Health = 2000,
 	Price = 50,
 })
 
@@ -152,7 +152,6 @@ if CLIENT then
 		end
 
 		PreviewGhost = ClientsideModel( "models/error.mdl" )
-		PreviewGhost:SetPos( LocalPlayer():GetShootPos() )
 		PreviewGhost:SetMaterial( "lights/white" )
 		PreviewGhost:SetRenderMode( RENDERMODE_TRANSCOLOR )
 		PreviewGhost:SetNoDraw( true )

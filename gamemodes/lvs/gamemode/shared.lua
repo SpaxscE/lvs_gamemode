@@ -8,6 +8,7 @@ DeriveGamemode( "base" )
 include( "player_class/player_lvs.lua" )
 include( "sh_moneysystem.lua" )
 include( "sh_vehicles.lua" )
+include( "sh_spectator.lua" )
 
 function GM:Initialize()
 	LVS.HudForceDefault = true
@@ -20,4 +21,7 @@ end
 
 function GM:InitPostEntity()
 	self:BuildVehiclePrices()
+end
+
+function GM:CreateTeams()
 end
