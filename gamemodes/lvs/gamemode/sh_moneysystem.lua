@@ -17,8 +17,19 @@ if CLIENT then
 
 	local Price = 0
 	local PriceTime = 0
+	local PriceData
+
 	function meta:CanAfford( price )
-		if not isnumber( price ) then return true end
+		if not isnumber( price ) then
+			if istable( price ) then
+				PriceData = price
+				price = PriceData.price
+			else
+				return true
+			end
+		else
+			PriceData = nil
+		end
 
 		local T =  CurTime()
 
@@ -104,6 +115,22 @@ if CLIENT then
 					draw.DrawText( "? ", "LVS_FONT", X + 40, Y - 50, ColorPrice, TEXT_ALIGN_RIGHT )
 					draw.DrawText( Price, "LVS_FONT", X + 40, Y - 50, ColorPrice, TEXT_ALIGN_LEFT )
 				end
+			end
+
+			if istable( PriceData ) and PriceData.icon and not PriceData.icon:IsError() then
+
+				local C255 = 255 * smMoneyVisible
+
+				if Price > Money then
+					surface.SetDrawColor(255,0,0,C255)
+				else
+					surface.SetDrawColor(0,255,0,C255)
+				end
+
+				surface.DrawRect( X - 5, Y - 180, 128, 128 )
+				surface.SetDrawColor( C255, C255, C255, C255 )
+				surface.SetMaterial( PriceData.icon )
+				surface.DrawTexturedRect( X + 4 - 5, Y - 180 + 4, 120, 120 )
 			end
 		end
 

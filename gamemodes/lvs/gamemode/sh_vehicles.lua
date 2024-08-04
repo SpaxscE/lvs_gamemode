@@ -3,8 +3,33 @@ GM.VehiclePrices = {}
 
 local meta = FindMetaTable( "Player" )
 
-function meta:lvsSetCurrentVehicle( class )
+function meta:lvsSetCurrentVehicle( class, icon )
 	self._lvsCurrentVehicle = class
+
+	if SERVER then return end
+
+	self._lvsCurrentVehicleData = {}
+	self._lvsCurrentVehicleData.icon = Material( icon )
+	self._lvsCurrentVehicleData.class = class
+	self._lvsCurrentVehicleData.price = GAMEMODE:GetVehiclePrice( class )
+
+	local EntTable = scripted_ents.GetList()[ class ]
+
+	if not EntTable or not EntTable.t or not EntTable.t.PrintName then
+		self._lvsCurrentVehicleData.nicename = class
+
+		return
+	end
+
+	self._lvsCurrentVehicleData.nicename = EntTable.t.PrintName
+end
+
+if CLIENT then
+	function meta:lvsGetCurrentVehicleData()
+		if not self._lvsCurrentVehicleData then return end
+
+		return self._lvsCurrentVehicleData
+	end
 end
 
 function meta:lvsGetCurrentVehicle()

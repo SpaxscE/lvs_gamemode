@@ -91,6 +91,9 @@ if CLIENT then
 		return true
 	end
 
+	local IconInstructionA = Material( "lvs/instructions/mouse_right.png" )
+	local IconInstructionB = Material( "lvs/instructions/mouse_left.png" )
+
 	function SWEP:DrawHUD()
 		local ply = LocalPlayer()
 
@@ -100,9 +103,32 @@ if CLIENT then
 
 		if not ply:KeyDown( IN_RELOAD ) then
 		
-			if IsValid( Vehicle ) then return end
+			if IsValid( Vehicle ) or vgui.CursorVisible() then return end
 
-			ply:CanAfford( GAMEMODE:GetVehiclePrice( ply:lvsGetCurrentVehicle() ) )
+			local data = ply:lvsGetCurrentVehicleData()
+
+			local X = ScrW() * 0.5
+			local Y = ScrH() - 105
+
+			if not data then
+				surface.SetDrawColor( 255, 255, 255, 255 )
+				surface.SetMaterial( IconInstructionA )
+				surface.DrawTexturedRect( X - 32, Y, 64, 64 )
+
+				draw.DrawText( "Open Store", "LVS_FONT", X, Y + 68, color_white, TEXT_ALIGN_CENTER )
+
+				return
+			end
+
+			local CanAfford = ply:CanAfford( data )
+
+			if not CanAfford then return end
+
+			surface.SetDrawColor( 255, 255, 255, 255 )
+			surface.SetMaterial( IconInstructionB )
+			surface.DrawTexturedRect( X - 32, Y, 64, 64 )
+
+			draw.DrawText( "Place Vehicle", "LVS_FONT", X, Y + 68, color_white, TEXT_ALIGN_CENTER )
 
 			return
 		end
@@ -144,7 +170,7 @@ if CLIENT then
 
 		local SWEP = ply:GetWeapon( "weapon_lvsvehicles" )
 
-		if not IsValid( SWEP ) or SWEP ~= ply:GetActiveWeapon() or (ply:InVehicle() and not ply:GetAllowWeaponsInVehicle()) or ply:KeyDown( IN_RELOAD ) then return end
+		if not IsValid( SWEP ) or SWEP ~= ply:GetActiveWeapon() or (ply:InVehicle() and not ply:GetAllowWeaponsInVehicle()) or ply:KeyDown( IN_RELOAD ) or vgui.CursorVisible() then return end
 
 		if ply:lvsGetCurrentVehicle() == "" or IsValid( SWEP:GetVehicle() ) then return end
 

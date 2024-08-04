@@ -82,7 +82,7 @@ function PANEL:DoClick()
 
 	surface.PlaySound( "ui/buttonclickrelease.wav" )
 
-	LocalPlayer():lvsSetCurrentVehicle( Class )
+	LocalPlayer():lvsSetCurrentVehicle( Class, self.m_MaterialName )
 end
 
 function PANEL:DoRightClick()
