@@ -19,6 +19,8 @@ SWEP.Secondary.DefaultClip	= -1
 SWEP.Secondary.Automatic		= false
 SWEP.Secondary.Ammo		= "none"
 
+SWEP.SpawnDistance = 512
+
 list.Set("Fortifications", "sandbags", {
 	Name = "Sandbags",
 	Class = "lvs_fortification",
@@ -90,7 +92,11 @@ function SWEP:GetTrace()
 
 	if not IsValid( ply ) then return end
 
-	return ply:GetEyeTrace()
+	local Trace = ply:GetEyeTrace()
+
+	local SpawnAllowed = (Trace.HitPos - ply:GetShootPos()):Length() < self.SpawnDistance
+
+	return Trace, SpawnAllowed
 end
 
 if CLIENT then
@@ -120,6 +126,8 @@ if CLIENT then
 		return PreviewGhost
 	end
 
+	local oldallowed
+
 	function SWEP:Think()
 		local Object = self:GetCurrentObject()
 		local ply = self:GetOwner()
@@ -130,16 +138,30 @@ if CLIENT then
 
 		local Ghost = self:GetPreviewGhost()
 
+		local trace, allowed = self:GetTrace()
+
 		if Ghost:GetModel() ~= Object.Model then
 			Ghost:SetModel( Object.Model )
 			Ghost:SetNoDraw( false )
-			Ghost:SetColor( Color(255,255,255,150) )
+			oldallowed = nil
 		end
 
-		Ghost:SetPos( self:GetTrace().HitPos )
-		Ghost:SetAngles( Angle(0, ply:EyeAngles().y, 0 ) )
+		local CanAfford = ply:CanAfford( Object.Price )
 
-		ply:CanAfford( Object.Price )
+		if not CanAfford then allowed = false end
+
+		if allowed ~= oldallowed then
+			oldallowed = allowed
+
+			if allowed then
+				Ghost:SetColor( Color(255,255,255,150) )
+			else
+				Ghost:SetColor( Color(255,0,0,100) )
+			end
+		end
+
+		Ghost:SetPos( trace.HitPos )
+		Ghost:SetAngles( Angle(0, ply:EyeAngles().y, 0 ) )
 	end
 
 	function SWEP:Deploy()
@@ -165,10 +187,6 @@ if CLIENT then
 	end
 else
 	function SWEP:Think()
-		local target = self:GetTrace().Entity
-
-		if not IsValid( target ) or not target.IsFortification then return end
-
 		local ply = self:GetOwner()
 
 		if not IsValid( ply ) then return end
@@ -181,7 +199,11 @@ else
 
 		if not Reload then return end
 
-		if target:GetCreatedBy() ~= ply then return end
+		local trace, allowed = self:GetTrace()
+	
+		local target = trace.Entity
+
+		if not allowed or not IsValid( target ) or not target.IsFortification or target:GetCreatedBy() ~= ply then return end
 
 		if SERVER then
 			if isnumber( target.ReturnMoney ) then
@@ -233,13 +255,17 @@ function SWEP:PrimaryAttack()
 
 	if not Object or not Object.Class or not Object.Model or Object.Model == "" then return end
 
+	local trace, allowed = self:GetTrace()
+
+	if not allowed then return end
+
 	if not ply:CanAfford( Object.Price ) then return end
 
 	ply:TakeMoney( Object.Price )
 
 	local Ent = ents.Create( Object.Class )
 	Ent:SetModel( Object.Model )
-	Ent:SetPos( self:GetTrace().HitPos )
+	Ent:SetPos( trace.HitPos )
 	Ent:SetAngles( Angle(0, ply:EyeAngles().y, 0 ) )
 	Ent:Spawn()
 	Ent:Activate()
