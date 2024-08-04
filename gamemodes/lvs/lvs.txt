@@ -12,10 +12,27 @@
 		{
 			"name"		"lvs_start_money"
 			"text"		"start_money"
+			"help"		"Amount of money you start with"
 			"type"		"Numeric"
 			"default"	"1000"
 		}
 		2
+		{
+			"name"		"lvs_time_build"
+			"text"		"build_time"
+			"help"		"How many seconds to prepare"
+			"type"		"Numeric"
+			"default"	"180"
+		}
+		3
+		{
+			"name"		"lvs_time_battle"
+			"text"		"match_time"
+			"help"		"Duration of the match"
+			"type"		"Numeric"
+			"default"	"720"
+		}
+		4
 		{
 			"name"		"mp_falldamage"
 			"text"		"realistic_falldamage"
