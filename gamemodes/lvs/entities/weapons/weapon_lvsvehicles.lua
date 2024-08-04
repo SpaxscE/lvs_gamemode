@@ -305,6 +305,8 @@ function SWEP:HandleVehicleRemove()
 
 	ply:ChatPrint( "Vehicle Sold" )
 
+	ply:AddMoney( GAMEMODE:GetVehiclePrice( Vehicle:GetClass() ) )
+
 	Vehicle:Remove()
 end
 

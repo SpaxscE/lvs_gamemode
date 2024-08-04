@@ -184,6 +184,10 @@ else
 		if target:GetCreatedBy() ~= ply then return end
 
 		if SERVER then
+			if isnumber( target.ReturnMoney ) then
+				ply:AddMoney( target.ReturnMoney )
+			end
+
 			target:Remove()
 		end
 
@@ -240,6 +244,7 @@ function SWEP:PrimaryAttack()
 	Ent:Spawn()
 	Ent:Activate()
 	Ent:SetCreatedBy( ply )
+	Ent.ReturnMoney = Object.Price
 end
 
 function SWEP:SecondaryAttack()
