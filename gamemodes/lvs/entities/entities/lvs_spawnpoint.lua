@@ -109,45 +109,8 @@ if CLIENT then
 	end
 
 	function ENT:OnRemove()
-		if not self.Snd then return end
-
-		self.Snd:Stop()
-		self.Snd = nil
 	end
 
 	function ENT:Think()
-		local ply = LocalPlayer()
-
-		local Dist = (ply:GetPos() - self:GetPos()):LengthSqr()
-
-		local CloseEnuf = Dist < 100000 and not self.FadingOut
-
-		if CloseEnuf ~= self.CloseEnuf then
-			self.CloseEnuf = CloseEnuf
-
-			if CloseEnuf then
-				if Dist < 1 then
-					self:EmitSound("beams/beamstart5.wav")
-				end
-
-				self.Snd = CreateSound(self, "ambient/levels/citadel/citadel_drone_loop"..math.random(1.6)..".wav")
-				self.Snd:PlayEx(0,50)
-
-				self.Snd:ChangeVolume( 1, 1 )
-			else
-				self.Snd:ChangeVolume( 0, 0.99 )
-
-				self.FadingOut = true
-
-				timer.Simple(1, function()
-					if not IsValid( self ) or not self.Snd then return end
-
-					self.Snd:Stop()
-					self.Snd = nil
-
-					self.FadingOut = nil
-				end)
-			end
-		end
 	end
 end
