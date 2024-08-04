@@ -28,6 +28,16 @@ if SERVER then
 		end
 
 		PObj:EnableMotion( false )
+
+		timer.Simple(1, function()
+			if not IsValid( self ) then return end
+
+			if not istable( self.GibModels ) then return end
+
+			for _, modelName in ipairs( self.GibModels ) do
+				util.PrecacheModel( modelName )
+			end
+		end)
 	end
 
 	function ENT:Think()
@@ -43,35 +53,51 @@ if SERVER then
 		dmginfo:SetDamage( damage )
 		dmginfo:SetAttacker( attacker )
 		dmginfo:SetInflictor( attacker )
-		dmginfo:SetDamageType( DMG_CRUSH + DMG_VEHICLE ) -- this will communicate to the damage system to handle this kind of damage differently.
+		dmginfo:SetDamageType( DMG_CRUSH + DMG_VEHICLE )
 		self:TakeDamageInfo( dmginfo )
 	end
 
 	function ENT:PhysicsCollide( data, physobj )
-		self:TakeCollisionDamage( self:GetHP() * 2, data.HitEntity )
-	end
+		if not IsValid( data.HitEntity ) then return end
 
-	ENT.DSArmorDamageReduction = 0.1
-	ENT.DSArmorDamageReductionType = DMG_AIRBOAT + DMG_SNIPER
+		if data.HitEntity.GetVehicleType then
+			if data.HitEntity:GetVehicleType() ~= "tank" then return end
+		else
+			if not data.HitEntity.GetBase then return end
 
-	ENT.DSArmorIgnoreDamageType = DMG_BULLET + DMG_CLUB
-	ENT.DSArmorIgnoreForce = 0
+			local Base = data.HitEntity:GetBase()
 
-	function ENT:OnTakeDamage( dmginfo )
-		if dmginfo:IsDamageType( self.DSArmorIgnoreDamageType ) then return end
+			if not IsValid( Base ) or not Base.GetVehicleType then return end
 
-		if dmginfo:IsDamageType( self.DSArmorDamageReductionType ) then
-			if dmginfo:GetDamage() ~= 0 then
-				dmginfo:ScaleDamage( self.DSArmorDamageReduction )
-
-				dmginfo:SetDamage( math.max(dmginfo:GetDamage(),1) )
-			end
+			if Base:GetVehicleType() ~= "tank" then return end
 		end
 
-		local IsFireDamage = dmginfo:IsDamageType( DMG_BURN )
-		local IsCollisionDamage = dmginfo:GetDamageType() == (DMG_CRUSH + DMG_VEHICLE)
+		local PhysObj = data.HitEntity:GetPhysicsObject()
 
-		if dmginfo:GetDamageForce():Length() < self.DSArmorIgnoreForce and not IsFireDamage then return end
+		if not IsValid( PhysObj ) then return end
+
+		self:TakeCollisionDamage( self:GetHP(), data.HitEntity )
+
+		local Vel = data.TheirOldVelocity
+		local AngVel = data.TheirOldAngularVelocity
+
+		PhysObj:SetVelocityInstantaneous( Vel )
+		PhysObj:SetAngleVelocityInstantaneous( AngVel )
+
+		timer.Simple( 0, function()
+			if not IsValid( PhysObj ) then return end
+
+			PhysObj:SetVelocityInstantaneous( Vel )
+			PhysObj:SetAngleVelocityInstantaneous( AngVel )
+		end )
+	end
+
+	ENT.DamageIgnoreType = DMG_SNIPER + DMG_AIRBOAT + DMG_BULLET + DMG_CLUB + DMG_DROWN + DMG_PARALYZE + DMG_NERVEGAS + DMG_POISON + DMG_BURN
+
+	function ENT:OnTakeDamage( dmginfo )
+		if self.IsDestroyed then return end
+
+		if dmginfo:IsDamageType( self.DamageIgnoreType ) then return end
 
 		local Damage = dmginfo:GetDamage()
 
@@ -84,8 +110,90 @@ if SERVER then
 		self:SetHP( NewHealth )
 
 		if NewHealth <= 0 then
-			SafeRemoveEntityDelayed( self, 0 )
+			self:Destroy()
 		end
+	end
+
+	local gibs = {
+		"models/gibs/manhack_gib01.mdl",
+		"models/gibs/manhack_gib02.mdl",
+		"models/gibs/manhack_gib03.mdl",
+		"models/gibs/manhack_gib04.mdl",
+		"models/props_c17/canisterchunk01a.mdl",
+		"models/props_c17/canisterchunk01d.mdl",
+		"models/props_c17/oildrumchunk01a.mdl",
+		"models/props_c17/oildrumchunk01b.mdl",
+		"models/props_c17/oildrumchunk01c.mdl",
+		"models/props_c17/oildrumchunk01d.mdl",
+		"models/props_c17/oildrumchunk01e.mdl",
+	}
+
+	function ENT:SpawnGibs()
+		local pos = self:LocalToWorld( self:OBBCenter() )
+		local ang = self:GetAngles()
+
+		self.GibModels = istable( self.GibModels ) and self.GibModels or gibs
+
+		for _, v in pairs( self.GibModels ) do
+			local ent = ents.Create( "prop_physics" )
+
+			if not IsValid( ent ) then continue end
+
+			ent:SetPos( pos )
+			ent:SetAngles( ang )
+			ent:SetModel( v )
+			ent:Spawn()
+			ent:Activate()
+			ent:SetRenderMode( RENDERMODE_TRANSALPHA )
+			ent:SetCollisionGroup( COLLISION_GROUP_WORLD )
+
+			local PhysObj = ent:GetPhysicsObject()
+
+			if IsValid( PhysObj ) then
+				PhysObj:SetVelocityInstantaneous( Vector( math.Rand(-1,1), math.Rand(-1,1), 1.5 ):GetNormalized() * math.random(250,400)  )
+				PhysObj:AddAngleVelocity( VectorRand() * 500 ) 
+				PhysObj:EnableDrag( false ) 
+			end
+
+			timer.Simple( 4.5, function()
+				if not IsValid( ent ) then return end
+
+				ent:SetRenderFX( kRenderFxFadeFast  ) 
+			end)
+
+			timer.Simple( 5, function()
+				if not IsValid( ent ) then return end
+
+				ent:Remove()
+			end)
+		end
+	end
+
+	function ENT:Explode()
+		local effectdata = EffectData()
+			effectdata:SetOrigin( self:LocalToWorld( self:OBBCenter() ) )
+		util.Effect( "lvs_fortification_explosion", effectdata, true, true )
+
+		if istable( self.BreakSounds ) then
+			self:EmitSound( table.Random( self.BreakSounds ),80,100,1)
+		else
+			if isstring( self.BreakSounds ) then
+				self:EmitSound( self.BreakSounds,80,100,1)
+			end
+		end
+
+		self:SpawnGibs()
+	end
+
+	function ENT:Destroy()
+		if self.IsDestroyed then return end
+
+		self.IsDestroyed = true
+
+		self:Explode()
+		self:SetSolid( SOLID_NONE )
+		self:SetCollisionGroup( COLLISION_GROUP_DEBRIS )
+		SafeRemoveEntityDelayed( self, 0 )
 	end
 end
 
