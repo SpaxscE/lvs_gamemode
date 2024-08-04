@@ -39,7 +39,7 @@ list.Set("Fortifications", "sandbags", {
 		"physics/cardboard/cardboard_box_break2.wav",
 		"physics/cardboard/cardboard_box_break3.wav",
 	},
-	Price = 30,
+	Price = 15,
 	Health = 2000,
 })
 
@@ -99,7 +99,7 @@ list.Set("Fortifications", "wirefence", {
 		"physics/metal/metal_chainlink_impact_soft2.wav",
 		"physics/metal/metal_chainlink_impact_soft3.wav",
 	},
-	Price = 25,
+	Price = 10,
 	Health = 100,
 })
 

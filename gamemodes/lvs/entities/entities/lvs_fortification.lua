@@ -157,13 +157,20 @@ if SERVER then
 				PhysObj:EnableDrag( false ) 
 			end
 
-			timer.Simple( 4.5, function()
+			timer.Simple( 5, function()
+				if not IsValid( ent ) then return end
+
+				ent:SetSolid( SOLID_NONE )
+				ent:PhysicsDestroy()
+			end)
+
+			timer.Simple( 119.5, function()
 				if not IsValid( ent ) then return end
 
 				ent:SetRenderFX( kRenderFxFadeFast  ) 
 			end)
 
-			timer.Simple( 5, function()
+			timer.Simple( 120, function()
 				if not IsValid( ent ) then return end
 
 				ent:Remove()
