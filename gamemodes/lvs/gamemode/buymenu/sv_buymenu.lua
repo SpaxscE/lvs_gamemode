@@ -131,6 +131,10 @@ function GM:SpawnVehicle( ply, EntityName, tr )
 
 	if not IsValid( entity ) then return end
 
+	if entity.SetAITEAM then
+		entity:SetAITEAM( ply:lvsGetAITeam() )
+	end
+
 	TryFixPropPosition( ply, entity, tr.HitPos )
 
 	return entity

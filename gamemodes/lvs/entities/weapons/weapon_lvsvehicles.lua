@@ -21,7 +21,7 @@ SWEP.Secondary.Ammo		= "none"
 
 SWEP.SpawnDistance = 512
 SWEP.RemoveDistance = 512
-SWEP.RemoveTime = 1 --20
+SWEP.RemoveTime = 20
 
 function SWEP:SetupDataTables()
 	self:NetworkVar( "Float", 1, "VehicleRemoveTime" )

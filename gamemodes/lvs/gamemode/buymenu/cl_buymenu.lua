@@ -235,7 +235,11 @@ local function BuildBuyMenu()
 end
 
 function GM:OpenBuyMenu()
-	if LocalPlayer():Team() == TEAM_SPECTATOR then return end
+	if LocalPlayer():Team() == TEAM_SPECTATOR then
+		GAMEMODE:OpenJoinMenu()
+
+		return
+	end
 
 	gui.EnableScreenClicker( true )
 

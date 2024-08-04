@@ -13,6 +13,14 @@ function ENT:SetupDataTables()
 	self:NetworkVar( "Float",2, "MaxHP" )
 end
 
+function ENT:GetAITEAM()
+	local ply = self:GetCreatedBy()
+
+	if not IsValid( ply ) then return 0 end
+
+	return ply:lvsGetAITeam()
+end
+
 if SERVER then
 	function ENT:Initialize()
 		self:PhysicsInit( SOLID_VPHYSICS )

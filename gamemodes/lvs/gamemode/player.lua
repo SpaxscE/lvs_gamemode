@@ -31,7 +31,9 @@ end
 
 function GM:PlayerInitialSpawn( ply, transiton )
 
+	ply:lvsSetAITeam( 0 )
 	ply:SetTeam( TEAM_SPECTATOR )
+	ply:SendLua( "GAMEMODE:OpenJoinMenu()" )
 
 	local ConVar = GetConVar( "lvs_start_money" )
 
@@ -163,4 +165,73 @@ function GM:PlayerSelectSpawn( pl, transiton )
 
 	return ChosenSpawnPoint
 
+end
+
+
+function GM:PlayerCanJoinTeam( ply, teamid )
+	if teamid ~= 1 and teamid ~= 2 and teamid ~= TEAM_SPECTATOR then ply:ChatPrint( "You can't join that team" ) return false end
+
+	local TimeBetweenSwitches = GAMEMODE.SecondsBetweenTeamSwitches or 10
+
+	if ply.LastTeamSwitch and RealTime() - ply.LastTeamSwitch < TimeBetweenSwitches then
+
+		ply.LastTeamSwitch = ply.LastTeamSwitch + 1
+
+		ply:ChatPrint( Format( "Please wait %i more seconds before trying to change team again", ( TimeBetweenSwitches - ( RealTime() - ply.LastTeamSwitch ) ) + 1 ) )
+
+		return false
+	end
+
+	if ply:lvsGetAITeam() == teamid then
+		ply:ChatPrint( "You're already on that team" )
+
+		return false
+	end
+
+	return true
+end
+
+function GM:PlayerRequestTeam( ply, teamid )
+
+	if not self:PlayerCanJoinTeam( ply, teamid ) then return end
+
+	self:PlayerJoinTeam( ply, teamid )
+end
+
+function GM:PlayerJoinTeam( ply, teamid )
+	local iOldTeam = ply:Team()
+
+	if ply:Alive() then
+		if iOldTeam == TEAM_SPECTATOR then
+			ply:KillSilent()
+		else
+			ply:Kill()
+		end
+	end
+
+	if teamid == TEAM_SPECTATOR then
+		ply:SetTeam( TEAM_SPECTATOR )
+		ply:lvsSetAITeam( 0 )
+	else
+		ply:SetTeam( TEAM_UNASSIGNED )
+		ply:lvsSetAITeam( teamid )
+	end
+
+	ply.LastTeamSwitch = RealTime()
+
+	self:OnPlayerChangedTeam( ply, iOldTeam, teamid )
+end
+
+function GM:OnPlayerChangedTeam( ply, oldteam, newteam )
+	if newteam == TEAM_SPECTATOR then
+
+		local Pos = ply:EyePos()
+		ply:Spawn()
+		ply:SetPos( Pos )
+
+	elseif oldteam == TEAM_SPECTATOR then
+
+		ply:Spawn()
+
+	end
 end
