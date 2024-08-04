@@ -160,7 +160,7 @@ if CLIENT then
 	local FrameMat = Material( "lvs/3d2dmats/frame.png" )
 	local ArrowMat = Material( "lvs/3d2dmats/arrow.png" )
 
-	hook.Add( "PostDrawOpaqueRenderables", "the_system_is_rigged", function( bDrawingDepth, bDrawingSkybox, isDraw3DSkybox )
+	hook.Add( "PostDrawTranslucentRenderables", "the_system_is_rigged", function( bDrawingDepth, bDrawingSkybox, isDraw3DSkybox )
 
 		if bDrawingDepth or bDrawingSkybox or isDraw3DSkybox then return end
 
