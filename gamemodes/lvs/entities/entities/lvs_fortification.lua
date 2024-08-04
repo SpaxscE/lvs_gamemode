@@ -80,6 +80,8 @@ if SERVER then
 
 				if Base:GetVehicleType() ~= "tank" then return end
 			end
+		else
+			if data.HitEntity:IsPlayer() then return end
 		end
 
 		local PhysObj = data.HitEntity:GetPhysicsObject()
