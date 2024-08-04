@@ -45,7 +45,7 @@ if CLIENT then
 	SWEP.SlotPos			= 1
 
 	SWEP.Purpose			= "Set Spawnpoint"
-	SWEP.Instructions		= "Left Click to Set,"
+	SWEP.Instructions		= "Left Click to Set, Right Click to Remove"
 
 	SWEP.DrawWeaponInfoBox 	= true
 
@@ -71,10 +71,7 @@ function SWEP:PrimaryAttack()
 
 	if not IsValid( ply ) then return end
 
-	local oldSpawn = ply:GetSpawnPoint()
-	if IsValid( oldSpawn ) then
-		oldSpawn:Remove()
-	end
+	if IsValid( ply:GetSpawnPoint() ) then return end
 
 	local StartPos = ply:GetShootPos()
 	local EndPos = StartPos - Vector(0,0,60000)
