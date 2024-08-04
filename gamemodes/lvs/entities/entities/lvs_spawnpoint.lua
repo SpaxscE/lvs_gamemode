@@ -7,10 +7,6 @@ ENT.AdminOnly		= false
 
 ENT.RenderGroup = RENDERGROUP_BOTH 
 
-function ENT:UpdateTransmitState() 
-	return TRANSMIT_ALWAYS
-end
-
 function ENT:SetupDataTables()
 	self:NetworkVar( "Entity",1, "CreatedBy" )
 end
@@ -50,6 +46,34 @@ if SERVER then
 	end
 
 	function ENT:OnTakeDamage( dmginfo )
+		if self.IsDestroyed then return end
+
+		self:Destroy()
+	end
+
+	function ENT:Explode()
+		local effectdata = EffectData()
+			effectdata:SetOrigin( self:LocalToWorld( self:OBBCenter() ) )
+		util.Effect( "lvs_fortification_explosion", effectdata, true, true )
+
+		if istable( self.BreakSounds ) then
+			self:EmitSound( table.Random( self.BreakSounds ),80,100,1)
+		else
+			if isstring( self.BreakSounds ) then
+				self:EmitSound( self.BreakSounds,80,100,1)
+			end
+		end
+	end
+
+	function ENT:Destroy()
+		if self.IsDestroyed then return end
+
+		self.IsDestroyed = true
+
+		self:Explode()
+		self:SetSolid( SOLID_NONE )
+		self:SetCollisionGroup( COLLISION_GROUP_DEBRIS )
+		SafeRemoveEntityDelayed( self, 0 )
 	end
 end
 
@@ -80,7 +104,6 @@ if CLIENT then
 		if (self.NextPing or 0) < CurTime() then
 			self.NextPing = CurTime() + 3
 			self.WaveScale = 1
-			self:EmitSound( "npc/combine_gunship/ping_search.wav",90,80,0.25 )
 		end
 
 		if (self.WaveScale or 0) > 0 then
