@@ -56,7 +56,7 @@ function GM:BuildVehiclePrices()
 		MaxShield = MaxShield or 0
 		MaxVelocity = MaxVelocity or 0
 
-		self.VehiclePrices[s] = math.Round( IgnoreForce * 0.25 + (MaxHealth + MaxShield * 1.5) * 0.25 + MaxVelocity * 0.1, 0 )
+		self.VehiclePrices[s] = math.Round( IgnoreForce * 0.25 + (MaxHealth + MaxShield * 10) * 0.25 + MaxVelocity * 0.1, 0 )
 		self.Vehicles[ s ] = AdminSpawnable
 	end
 end
