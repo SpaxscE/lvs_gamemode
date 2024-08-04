@@ -19,12 +19,12 @@ SWEP.Secondary.DefaultClip	= -1
 SWEP.Secondary.Automatic		= true
 SWEP.Secondary.Ammo		= "none"
 
+SWEP.SpawnDistance = 512
 SWEP.RemoveDistance = 512
 SWEP.RemoveTime = 1 --20
 
 function SWEP:SetupDataTables()
 	self:NetworkVar( "Float", 1, "VehicleRemoveTime" )
-	self:NetworkVar( "Float", 2, "VehiclePrice" )
 	self:NetworkVar( "Entity", 1, "Vehicle" )
 end
 
@@ -33,9 +33,11 @@ function SWEP:GetTrace()
 
 	if not IsValid( ply ) then return end
 
-	local trace = ply:GetEyeTrace()
+	local Trace = ply:GetEyeTrace()
 
-	return trace
+	local SpawnAllowed = (Trace.HitPos - ply:GetShootPos()):Length() < self.SpawnDistance
+
+	return Trace, SpawnAllowed
 end
 
 if CLIENT then
@@ -128,6 +130,45 @@ if CLIENT then
 
 		DrawText( X, Y + 34, "Selling Vehicle..." )
 	end
+
+	local FrameMat = Material( "lvs/3d2dmats/frame.png" )
+	local ArrowMat = Material( "lvs/3d2dmats/arrow.png" )
+
+	hook.Add( "PostDrawOpaqueRenderables", "the_system_is_rigged", function( bDrawingDepth, bDrawingSkybox, isDraw3DSkybox )
+
+		if bDrawingDepth or bDrawingSkybox or isDraw3DSkybox then return end
+
+		local ply = LocalPlayer()
+
+		if not IsValid( ply ) then return end
+
+		local SWEP = ply:GetWeapon( "weapon_lvsvehicles" )
+
+		if not IsValid( SWEP ) or SWEP ~= ply:GetActiveWeapon() or (ply:InVehicle() and not ply:GetAllowWeaponsInVehicle()) or ply:KeyDown( IN_RELOAD ) then return end
+
+		if ply:lvsGetCurrentVehicle() == "" or IsValid( SWEP:GetVehicle() ) then return end
+
+		local trace, allowed = SWEP:GetTrace()
+
+		local pos = trace.HitPos + trace.HitNormal
+		local ang = Angle(0,ply:EyeAngles().y - 90,0)
+
+		if allowed then
+			surface.SetDrawColor( 0, 127, 255, 255 )
+		else
+			surface.SetDrawColor( 255, 0, 0, 255 )
+		end
+
+		cam.Start3D2D( pos, ang, 0.05 )
+			surface.SetMaterial( FrameMat )
+			surface.DrawTexturedRect( -1024, -1024, 2048, 2048 )
+		cam.End3D2D()
+
+		cam.Start3D2D( pos + Vector(0,0,50 + math.cos( CurTime() * 4 ) * 25 ), ang + Angle(0,180,-90), 0.05 )
+			surface.SetMaterial( ArrowMat )
+			surface.DrawTexturedRect( -512, -512, 1024, 1024 )
+		cam.End3D2D()
+	end )
 end
 
 function SWEP:Initialize()
@@ -155,9 +196,9 @@ function SWEP:PrimaryAttack()
 		end
 	end
 
-	local trace = self:GetTrace()
+	local trace, allowed = self:GetTrace()
 
-	if not trace then return end
+	if not allowed then return end
 
 	local class = ply:lvsGetCurrentVehicle()
 	local price = GAMEMODE:GetVehiclePrice( class )
