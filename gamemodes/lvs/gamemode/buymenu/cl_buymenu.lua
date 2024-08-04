@@ -62,6 +62,7 @@ local function BuildBuyMenu()
 			DButton:SetSize( 128, 128 )
 			DButton:SetName( obj.nicename )
 			DButton:SetClassName( obj.classname )
+			DButton:SetPrice( GAMEMODE:GetVehiclePrice( obj.classname ) )
 			DButton:SetAdminOnly( obj.admin )
 			DButton:SetMaterial( obj.material )
 		end

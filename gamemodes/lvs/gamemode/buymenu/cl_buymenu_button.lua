@@ -34,6 +34,18 @@ function PANEL:Init()
 
 end
 
+function PANEL:SetPrice( price )
+
+	self.m_VehiclePrice = price
+
+end
+
+function PANEL:GetPrice( price )
+	if not isnumber( self.m_VehiclePrice ) then return 0 end
+
+	return self.m_VehiclePrice
+end
+
 function PANEL:SetName( name )
 
 	self:SetTooltip( name )
@@ -79,6 +91,10 @@ end
 function PANEL:OnDepressionChanged( b )
 end
 
+local ColorPriceA= Color(255,191,0,255)
+local ColorPriceB = Color(255,0,0,255)
+local ColorPriceC = Color(0,255,0,255)
+
 function PANEL:Paint( w, h )
 
 	if self.Depressed and not self.Dragging then
@@ -117,7 +133,30 @@ function PANEL:Paint( w, h )
 
 	end
 
+	local Money = LocalPlayer():GetMoney()
+	local Price = self:GetPrice()
+
+	if Price == 0 then
+
+	else
+		if Money < Price then
+			surface.SetDrawColor( 255, 0, 0, 255 )
+		end
+	end
+
 	surface.DrawTexturedRect( self.Border, self.Border, w-self.Border*2, h-self.Border*2 )
+
+	if Price == 0 then
+		draw.DrawText( "$ ".."Free", "LVS_FONT", self.Border + 10, self.Border + 8, ColorPriceC, TEXT_ALIGN_LEFT )
+	else
+		if Money < Price then
+			draw.DrawText( "$ "..Price, "LVS_FONT", self.Border + 10, self.Border + 8, ColorPriceB, TEXT_ALIGN_LEFT )
+		else
+			draw.DrawText( "$ "..Price, "LVS_FONT", self.Border + 10, self.Border + 8, ColorPriceA, TEXT_ALIGN_LEFT )
+		end
+	end
+
+	surface.SetDrawColor( 255, 255, 255, 255 )
 
 	if self:GetAdminOnly() then
 		surface.SetMaterial( matOverlay_AdminOnly )
