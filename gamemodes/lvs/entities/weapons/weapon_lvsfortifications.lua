@@ -106,10 +106,6 @@ list.Set("Fortifications", "wirefence", {
 function SWEP:SetupDataTables()
 	self:NetworkVar( "Int", 1, "NumIndex" )
 	self:NetworkVar( "String", 1, "Item" )
-
-	if SERVER then
-		self:SetNumIndex( 1 )
-	end
 end
 
 function SWEP:GetObjectList()
@@ -276,7 +272,7 @@ end
 function SWEP:Initialize()
 	self:SetHoldType( self.HoldType )
 
-	self:GetObjectList()
+	self:SelectNextItem()
 end
 
 function SWEP:PrimaryAttack()
@@ -327,30 +323,36 @@ function SWEP:PrimaryAttack()
 	end
 end
 
+function SWEP:SelectNextItem()
+	if CLIENT then return end
+
+	local objects = self:GetObjectList()
+
+	self:SetNumIndex( self:GetNumIndex() + 1 )
+
+	if self:GetNumIndex() > table.Count( objects ) then
+		self:SetNumIndex( 1 )
+	end
+
+	local desired = self:GetNumIndex()
+	local index = 0
+
+	for name, _ in pairs( objects ) do
+		index = index + 1
+
+		if index ~= desired then continue end
+
+		self:SetItem( name )
+
+		break
+	end
+end
+
 function SWEP:SecondaryAttack()
 	self:EmitSound( "Weapon_Pistol.Empty" )
 
 	if SERVER then
-		local objects = self:GetObjectList()
-
-		self:SetNumIndex( self:GetNumIndex() + 1 )
-
-		if self:GetNumIndex() > table.Count( objects ) then
-			self:SetNumIndex( 1 )
-		end
-
-		local desired = self:GetNumIndex()
-		local index = 0
-
-		for name, _ in pairs( objects ) do
-			index = index + 1
-
-			if index ~= desired then continue end
-
-			self:SetItem( name )
-
-			break
-		end
+		self:SelectNextItem()
 	end
 end
 
