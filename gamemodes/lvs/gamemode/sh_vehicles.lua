@@ -1,6 +1,20 @@
 GM.Vehicles = {}
 GM.VehiclePrices = {}
 
+local meta = FindMetaTable( "Player" )
+
+function meta:lvsSetCurrentVehicle( class )
+	self._lvsCurrentVehicle = class
+end
+
+function meta:lvsGetCurrentVehicle()
+	return self._lvsCurrentVehicle or ""
+end
+
+function meta:lvsRemoveCurrentVehicle()
+	self._lvsCurrentVehicle = nil
+end
+
 function GM:VehicleClassAllowed( class )
 	return isbool( self.Vehicles[ class ] )
 end

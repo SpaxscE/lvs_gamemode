@@ -11,20 +11,6 @@ net.Receive( "lvs_buymenu", function( len, ply )
 	ply:lvsSetCurrentVehicle( class )
 end )
 
-local meta = FindMetaTable( "Player" )
-
-function meta:lvsSetCurrentVehicle( class )
-	self._lvsCurrentVehicle = class
-end
-
-function meta:lvsGetCurrentVehicle()
-	return self._lvsCurrentVehicle or ""
-end
-
-function meta:lvsRemoveCurrentVehicle()
-	self._lvsCurrentVehicle = nil
-end
-
 local function fixupProp( ply, ent, hitpos, mins, maxs )
 	local entPos = ent:GetPos()
 	local endposD = ent:LocalToWorld( mins )

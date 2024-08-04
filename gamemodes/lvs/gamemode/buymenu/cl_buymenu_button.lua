@@ -4,6 +4,7 @@ local matOverlay_Normal = Material( "gui/ContentIcon-normal.png" )
 local matOverlay_Hovered = Material( "gui/ContentIcon-hovered.png" )
 
 local matOverlay_AdminOnly = Material( "icon16/shield.png" )
+local matOverlay_Selected = Material( "icon16/tick.png" )
 
 AccessorFunc( PANEL, "m_Color", "Color" )
 AccessorFunc( PANEL, "m_SpawnName", "SpawnName" )
@@ -73,13 +74,15 @@ function PANEL:SetMaterial( name )
 end
 
 function PANEL:DoClick()
-	GAMEMODE:CloseBuyMenu()
+	local Class = self:GetClassName()
 
 	net.Start( "lvs_buymenu" )
-		net.WriteString( self:GetClassName() )
+		net.WriteString( Class )
 	net.SendToServer()
 
 	surface.PlaySound( "ui/buttonclickrelease.wav" )
+
+	LocalPlayer():lvsSetCurrentVehicle( Class )
 end
 
 function PANEL:DoRightClick()
@@ -94,6 +97,8 @@ end
 local ColorPriceA= Color(255,191,0,255)
 local ColorPriceB = Color(255,0,0,255)
 local ColorPriceC = Color(0,255,0,255)
+
+local ColorSelect = Color(0,127,255,255)
 
 function PANEL:Paint( w, h )
 
@@ -133,16 +138,9 @@ function PANEL:Paint( w, h )
 
 	end
 
-	local Money = LocalPlayer():GetMoney()
+	local ply = LocalPlayer()
+	local Money = ply:GetMoney()
 	local Price = self:GetPrice()
-
-	if Price == 0 then
-
-	else
-		if Money < Price then
-			surface.SetDrawColor( 255, 0, 0, 255 )
-		end
-	end
 
 	surface.DrawTexturedRect( self.Border, self.Border, w-self.Border*2, h-self.Border*2 )
 
@@ -158,9 +156,22 @@ function PANEL:Paint( w, h )
 
 	surface.SetDrawColor( 255, 255, 255, 255 )
 
-	if self:GetAdminOnly() then
-		surface.SetMaterial( matOverlay_AdminOnly )
-		surface.DrawTexturedRect( self.Border + 8, self.Border + 8, 16, 16 )
+	if ply:lvsGetCurrentVehicle() == self:GetClassName() then
+		if self:GetAdminOnly() then
+			surface.SetMaterial( matOverlay_AdminOnly )
+			surface.DrawTexturedRect( w - 16 - self.Border - 8, self.Border + 8, 16, 16 )
+
+			surface.SetMaterial( matOverlay_Selected )
+			surface.DrawTexturedRect( w - 32 - self.Border - 8, self.Border + 8, 16, 16 )
+		else
+			surface.SetMaterial( matOverlay_Selected )
+			surface.DrawTexturedRect( w - 16 - self.Border - 8, self.Border + 8, 16, 16 )
+		end
+	else
+		if self:GetAdminOnly() then
+			surface.SetMaterial( matOverlay_AdminOnly )
+			surface.DrawTexturedRect( w - 16 - self.Border - 8, self.Border + 8, 16, 16 )
+		end
 	end
 end
 

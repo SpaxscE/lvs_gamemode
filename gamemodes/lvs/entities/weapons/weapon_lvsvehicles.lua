@@ -94,9 +94,16 @@ if CLIENT then
 
 		if ply:InVehicle() and not ply:GetAllowWeaponsInVehicle() then return end
 
-		if not ply:KeyDown( IN_RELOAD ) then return end
-
 		local Vehicle = self:GetVehicle()
+
+		if not ply:KeyDown( IN_RELOAD ) then
+		
+			if IsValid( Vehicle ) then return end
+
+			ply:CanAfford( GAMEMODE:GetVehiclePrice( ply:lvsGetCurrentVehicle() ) )
+
+			return
+		end
 
 		local X = ScrW() * 0.5
 		local Y = ScrH() * 0.5
