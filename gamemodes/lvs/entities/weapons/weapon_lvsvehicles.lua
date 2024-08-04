@@ -41,7 +41,7 @@ function SWEP:GetTrace()
 end
 
 if CLIENT then
-	SWEP.PrintName		= "Vehicle Remote"
+	SWEP.PrintName		= "Vehicles"
 	SWEP.Author			= "Luna"
 
 	SWEP.Slot				= 4

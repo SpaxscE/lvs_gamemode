@@ -143,8 +143,8 @@ if CLIENT then
 	SWEP.Slot				= 3
 	SWEP.SlotPos			= 1
 
-	SWEP.Purpose			= ""
-	SWEP.Instructions		= ""
+	SWEP.Purpose			= "Spawn Fortifications"
+	SWEP.Instructions		= "Left Click to Spawn, Right Click to Switch, Reload to Remove"
 
 	SWEP.DrawWeaponInfoBox 	= true
 
@@ -156,6 +156,7 @@ if CLIENT then
 		end
 
 		PreviewGhost = ClientsideModel( "models/error.mdl" )
+		PreviewGhost:SetPos( LocalPlayer():GetShootPos() )
 		PreviewGhost:SetMaterial( "lights/white" )
 		PreviewGhost:SetRenderMode( RENDERMODE_TRANSCOLOR )
 		PreviewGhost:SetNoDraw( true )
@@ -180,6 +181,7 @@ if CLIENT then
 		if Ghost:GetModel() ~= Object.Model then
 			Ghost:SetModel( Object.Model )
 			Ghost:SetNoDraw( false )
+
 			oldallowed = nil
 		end
 
@@ -204,23 +206,21 @@ if CLIENT then
 	function SWEP:Deploy()
 		self:SendWeaponAnim( ACT_VM_DEPLOY )
 
-		self:GetPreviewGhost():SetNoDraw( false )
-
 		return true
 	end
 
 	function SWEP:Holster( wep )
-		self:GetPreviewGhost():SetNoDraw( true )
+		self:GetPreviewGhost():Remove()
 
 		return true
 	end
 
 	function SWEP:OnRemove()
-		self:GetPreviewGhost():SetNoDraw( true )
+		self:GetPreviewGhost():Remove()
 	end
 
 	function SWEP:OnDrop()
-		self:GetPreviewGhost():SetNoDraw( false )
+		self:GetPreviewGhost():Remove()
 	end
 else
 	function SWEP:Think()
@@ -275,6 +275,8 @@ end
 
 function SWEP:Initialize()
 	self:SetHoldType( self.HoldType )
+
+	self:GetObjectList()
 end
 
 function SWEP:PrimaryAttack()
