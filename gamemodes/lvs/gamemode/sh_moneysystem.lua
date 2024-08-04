@@ -5,12 +5,6 @@ function meta:GetMoney()
 	return self:GetNWFloat("PlayerMoney", 0)
 end
 
-function meta:CanAfford( price )
-	if not isnumber( price ) then return true end
-
-	return self:GetMoney() >= price
-end
-
 if CLIENT then
 	local MoneyTime = 0
 	local MoneyNextSound = 0
@@ -35,6 +29,17 @@ if CLIENT then
 
 		return self:GetMoney() >= price
 	end
+
+	net.Receive( "lvs_can_afford", function( len )
+
+		local price = net.ReadFloat()
+
+		local ply = LocalPlayer()
+
+		if not IsValid( ply ) then return end
+
+		ply:CanAfford( price )
+	end )
 
 	hook.Add( "PlayerBindPress", "lvs_show_moneyinfo", function( ply, bind, pressed )
 		if string.find( bind, "+showscores" ) then 
@@ -91,12 +96,12 @@ if CLIENT then
 				if Price > Money then
 					local ColorPrice = Color(255,0,0,255 * smMoneyVisible)
 
-					draw.DrawText( "- ", "LVS_FONT", X + 40, Y - 50, ColorPrice, TEXT_ALIGN_RIGHT )
+					draw.DrawText( "? ", "LVS_FONT", X + 40, Y - 50, ColorPrice, TEXT_ALIGN_RIGHT )
 					draw.DrawText( Price, "LVS_FONT", X + 40, Y - 50, ColorPrice, TEXT_ALIGN_LEFT )
 				else
 					local ColorPrice = Color(0,255,0,255 * smMoneyVisible)
 
-					draw.DrawText( "- ", "LVS_FONT", X + 40, Y - 50, ColorPrice, TEXT_ALIGN_RIGHT )
+					draw.DrawText( "? ", "LVS_FONT", X + 40, Y - 50, ColorPrice, TEXT_ALIGN_RIGHT )
 					draw.DrawText( Price, "LVS_FONT", X + 40, Y - 50, ColorPrice, TEXT_ALIGN_LEFT )
 				end
 			end
@@ -123,6 +128,18 @@ if CLIENT then
 	end
 
 	return
+end
+
+util.AddNetworkString( "lvs_can_afford" )
+
+function meta:CanAfford( price )
+	if not isnumber( price ) then return true end
+
+	net.Start( "lvs_can_afford", true )
+		net.WriteFloat( price )
+	net.Send( self )
+
+	return self:GetMoney() >= price
 end
 
 function meta:AddMoney( amount )
