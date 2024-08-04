@@ -172,7 +172,9 @@ if CLIENT then
 
 		if not IsValid( SWEP ) or SWEP ~= ply:GetActiveWeapon() or (ply:InVehicle() and not ply:GetAllowWeaponsInVehicle()) or ply:KeyDown( IN_RELOAD ) or vgui.CursorVisible() then return end
 
-		if ply:lvsGetCurrentVehicle() == "" or IsValid( SWEP:GetVehicle() ) then return end
+		local Vehicle = SWEP:GetVehicle()
+
+		if ply:lvsGetCurrentVehicle() == "" or (IsValid( Vehicle ) and Vehicle:GetHP() > 0) then return end
 
 		local trace, allowed = SWEP:GetTrace()
 
@@ -218,7 +220,17 @@ function SWEP:PrimaryAttack()
 
 	if IsValid( Vehicle ) then
 		if isfunction( Vehicle.IsDestroyed ) and Vehicle:IsDestroyed() then
-			Vehicle:Remove() --  TODO: add nice effect
+			timer.Simple( 119.5, function()
+				if not IsValid( Vehicle ) then return end
+
+				Vehicle:SetRenderFX( kRenderFxFadeFast  ) 
+			end)
+
+			timer.Simple( 120, function()
+				if not IsValid( Vehicle ) then return end
+
+				Vehicle:Remove()
+			end)
 		else
 			ply:ChatPrint( "You already have a Vehicle!" )
 
