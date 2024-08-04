@@ -24,6 +24,7 @@ SWEP.RemoveTime = 1 --20
 
 function SWEP:SetupDataTables()
 	self:NetworkVar( "Float", 1, "VehicleRemoveTime" )
+	self:NetworkVar( "Float", 2, "VehiclePrice" )
 	self:NetworkVar( "Entity", 1, "Vehicle" )
 end
 
@@ -118,7 +119,7 @@ if CLIENT then
 		Circle:SetEndAngle( 0 )
 		Circle()
 
-		DrawText( X, Y + 34, "Removing Vehicle..." )
+		DrawText( X, Y + 34, "Selling Vehicle..." )
 	end
 end
 
@@ -133,39 +134,40 @@ function SWEP:PrimaryAttack()
 
 	if not IsValid( ply ) then return end
 
-	if IsValid( self:GetVehicle() ) then
-		if SERVER then
+	if CLIENT then return end
+
+	local Vehicle = self:GetVehicle()
+
+	if IsValid( Vehicle ) then
+		if isfunction( Vehicle.IsDestroyed ) and Vehicle:IsDestroyed() then
+			Vehicle:Remove() --  TODO: add nice effect
+		else
 			ply:ChatPrint( "You already have a Vehicle!" )
-		end
 
-		if CLIENT and IsFirstTimePredicted() then
-			ply:EmitSound("buttons/button10.wav")
-		end
-
-		return
-	else
-		if CLIENT and IsFirstTimePredicted() then
-			ply:EmitSound("buttons/button14.wav")
+			return
 		end
 	end
-
-	if CLIENT then return end
 
 	local trace = self:GetTrace()
 
 	if not trace then return end
 
-	ply._SpawnedVehicle = GAMEMODE:SpawnVehicle( ply, ply:lvsGetCurrentVehicle(), trace )
+	local class = ply:lvsGetCurrentVehicle()
+	local price = GAMEMODE:GetVehiclePrice( class )
+
+	if not ply:CanAfford( price ) then ply:ChatPrint( "You don't have enough money!" ) return end
+
+	ply._SpawnedVehicle = GAMEMODE:SpawnVehicle( ply, class, trace )
 
 	if not IsValid( ply._SpawnedVehicle ) then return end
 
-	ply:lvsRemoveCurrentVehicle()
+	ply:TakeMoney( price )
 
 	self:SetVehicleRemoveTime( CurTime() + self.RemoveTime )
 
 	self:SetVehicle( ply._SpawnedVehicle )
 
-	ply:ChatPrint( "Vehicle Spawned" )
+	ply:ChatPrint( "Vehicle Purchased" )
 end
 
 function SWEP:SecondaryAttack()
@@ -227,9 +229,7 @@ function SWEP:HandleVehicleRemove()
 
 	ply:EmitSound("buttons/button15.wav")
 
-	ply:ChatPrint( "Vehicle Removed" )
-
-	ply:lvsSetCurrentVehicle( Vehicle:GetClass() )
+	ply:ChatPrint( "Vehicle Sold" )
 
 	Vehicle:Remove()
 end
