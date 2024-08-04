@@ -97,6 +97,7 @@ function SWEP:PrimaryAttack()
 end
 
 function SWEP:SecondaryAttack()
+	self:Reload()
 end
 
 function SWEP:Reload()

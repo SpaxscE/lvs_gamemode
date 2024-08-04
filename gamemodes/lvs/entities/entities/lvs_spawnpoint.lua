@@ -54,6 +54,9 @@ if SERVER then
 end
 
 if CLIENT then
+	local ColFriend = Color(0,127,255,255)
+	local ColEnemy = Color(255,0,0,255)
+
 	local mat = Material( "sprites/light_glow02_add" )
 	function ENT:DrawTranslucent()
 		self:DrawModel( flags )
@@ -61,7 +64,7 @@ if CLIENT then
 		local pos = self:GetPos()
 		local endpos = self:LocalToWorld( Vector(0,0,14) )
 
-		local Col = Color(0,127,255,255)
+		local Col = self:GetAITEAM() ~= LocalPlayer():lvsGetAITeam() and ColEnemy or ColFriend
 
 		render.SetMaterial( mat )
 		render.DrawSprite( pos, 30, 30, Col )
@@ -72,6 +75,8 @@ if CLIENT then
 	function ENT:Draw()
 		local pos = self:GetPos()
 
+		local Col = self:GetAITEAM() ~= LocalPlayer():lvsGetAITeam() and ColEnemy or ColFriend
+
 		if (self.NextPing or 0) < CurTime() then
 			self.NextPing = CurTime() + 3
 			self.WaveScale = 1
@@ -81,9 +86,8 @@ if CLIENT then
 		if (self.WaveScale or 0) > 0 then
 			self.WaveScale = math.max( self.WaveScale - FrameTime(), 0 )
 			local InvScale = 1 - self.WaveScale
-	
+
 			cam.Start3D2D( self:GetPos() + Vector(0,0,10), self:LocalToWorldAngles( Angle(0,-90,0) ), 1 )
-				local Col = Color(0,127,255,255)
 				surface.SetDrawColor( Col.r, Col.g, Col.b, 255 * self.WaveScale )
 				surface.SetMaterial( RING )
 				surface.DrawTexturedRectRotated( 0, 0, 256 * InvScale, 256 * InvScale, 0 )
