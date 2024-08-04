@@ -50,18 +50,64 @@ if CLIENT then
 	SWEP.DrawWeaponInfoBox 	= true
 
 	--SWEP.WepSelectIcon 			= surface.GetTextureID( "weapons/lvsrepair" )
-end
-function SWEP:Think()
 
+	function SWEP:PrimaryAttack()
+	end
+
+	function SWEP:SecondaryAttack()
+	end
+
+	function SWEP:Reload()
+	end
+
+	return
+end
+
+function SWEP:Think()
 end
 
 function SWEP:PrimaryAttack()
+	local ply = self:GetOwner()
+
+	if not IsValid( ply ) then return end
+
+	local oldSpawn = ply:GetSpawnPoint()
+	if IsValid( oldSpawn ) then
+		oldSpawn:Remove()
+	end
+
+	local StartPos = ply:GetShootPos()
+	local EndPos = StartPos - Vector(0,0,60000)
+
+	local trace = util.TraceLine( {
+		start = StartPos,
+		endpos = EndPos,
+		filter = ply
+	} )
+
+	local ent = ents.Create( "lvs_spawnpoint" )
+	ent:SetPos( trace.HitPos + trace.HitNormal )
+	ent:SetAngles( Angle(0,ply:EyeAngles().y,0) )
+	ent:Spawn()
+	ent:Activate()
+	ent:SetOwner( ply )
+	ent:SetCreatedBy( ply )
+
+	ply:SetSpawnPoint( ent )
 end
 
 function SWEP:SecondaryAttack()
 end
 
 function SWEP:Reload()
+	local ply = self:GetOwner()
+
+	if not IsValid( ply ) then return end
+
+	local oldSpawn = ply:GetSpawnPoint()
+	if IsValid( oldSpawn ) then
+		oldSpawn:Remove()
+	end
 end
 
 function SWEP:Initialize()
