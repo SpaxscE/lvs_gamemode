@@ -39,7 +39,7 @@ list.Set("Fortifications", "sandbags", {
 		"physics/cardboard/cardboard_box_break2.wav",
 		"physics/cardboard/cardboard_box_break3.wav",
 	},
-	Price = 50,
+	Price = 30,
 	Health = 2000,
 })
 
@@ -57,7 +57,7 @@ list.Set("Fortifications", "hedgehog", {
 		"physics/metal/metal_box_break2.wav",
 	},
 	Health = 1000,
-	Price = 200,
+	Price = 75,
 })
 
 list.Set("Fortifications", "dragonsteeth", {
@@ -78,8 +78,8 @@ list.Set("Fortifications", "dragonsteeth", {
 		"physics/concrete/boulder_impact_hard3.wav",
 		"physics/concrete/boulder_impact_hard4.wav",
 	},
-	Health = 6000,
-	Price = 100,
+	Health = 3000,
+	Price = 50,
 })
 
 list.Set("Fortifications", "wirefence", {

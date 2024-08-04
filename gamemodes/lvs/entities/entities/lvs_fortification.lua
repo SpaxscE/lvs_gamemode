@@ -60,16 +60,18 @@ if SERVER then
 	function ENT:PhysicsCollide( data, physobj )
 		if not IsValid( data.HitEntity ) then return end
 
-		if data.HitEntity.GetVehicleType then
-			if data.HitEntity:GetVehicleType() ~= "tank" then return end
-		else
-			if not data.HitEntity.GetBase then return end
+		if self:GetMaxHP() > 100 then
+			if data.HitEntity.GetVehicleType then
+				if data.HitEntity:GetVehicleType() ~= "tank" then return end
+			else
+				if not data.HitEntity.GetBase then return end
 
-			local Base = data.HitEntity:GetBase()
+				local Base = data.HitEntity:GetBase()
 
-			if not IsValid( Base ) or not Base.GetVehicleType then return end
+				if not IsValid( Base ) or not Base.GetVehicleType then return end
 
-			if Base:GetVehicleType() ~= "tank" then return end
+				if Base:GetVehicleType() ~= "tank" then return end
+			end
 		end
 
 		local PhysObj = data.HitEntity:GetPhysicsObject()
