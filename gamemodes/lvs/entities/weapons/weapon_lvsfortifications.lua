@@ -103,6 +103,29 @@ list.Set("Fortifications", "wirefence", {
 	Health = 100,
 })
 
+list.Set("Fortifications", "ramp", {
+	Name = "Ramp",
+	Class = "lvs_fortification_playerblocker",
+	Model = "models/hunter/triangles/1x1x2.mdl",
+	Offset = 20,
+	OffsetAngle = Angle(0,90,10),
+	GibModels = {
+		"models/hunter/blocks/cube025x025x025.mdl",
+		"models/hunter/blocks/cube025x025x025.mdl",
+		"models/hunter/blocks/cube025x025x025.mdl",
+		"models/hunter/blocks/cube025x025x025.mdl",
+		"models/hunter/blocks/cube025x05x025.mdl",
+	},
+	BreakSounds = {
+		"physics/concrete/boulder_impact_hard1.wav",
+		"physics/concrete/boulder_impact_hard2.wav",
+		"physics/concrete/boulder_impact_hard3.wav",
+		"physics/concrete/boulder_impact_hard4.wav",
+	},
+	Price = 15,
+	Health = 1000,
+})
+
 function SWEP:SetupDataTables()
 	self:NetworkVar( "Int", 1, "NumIndex" )
 	self:NetworkVar( "String", 1, "Item" )
@@ -194,8 +217,17 @@ if CLIENT then
 			end
 		end
 
-		Ghost:SetPos( trace.HitPos )
-		Ghost:SetAngles( Angle(0, ply:EyeAngles().y, 0 ) )
+		if Object.Offset then
+			Ghost:SetPos( trace.HitPos + Vector(0,0,Object.Offset) )
+		else
+			Ghost:SetPos( trace.HitPos )
+		end
+
+		if Object.OffsetAngle then
+			Ghost:SetAngles( Angle( Object.OffsetAngle.p , ply:EyeAngles().y + Object.OffsetAngle.y,  Object.OffsetAngle.r ) )
+		else
+			Ghost:SetAngles( Angle(0, ply:EyeAngles().y, 0 ) )
+		end
 	end
 
 	function SWEP:Deploy()
@@ -299,8 +331,19 @@ function SWEP:PrimaryAttack()
 
 	local Ent = ents.Create( Object.Class )
 	Ent:SetModel( Object.Model )
-	Ent:SetPos( trace.HitPos )
-	Ent:SetAngles( Angle(0, ply:EyeAngles().y, 0 ) )
+
+	if Object.Offset then
+		Ent:SetPos( trace.HitPos + Vector(0,0,Object.Offset) )
+	else
+		Ent:SetPos( trace.HitPos )
+	end
+
+	if Object.OffsetAngle then
+		Ent:SetAngles( Angle( Object.OffsetAngle.p , ply:EyeAngles().y + Object.OffsetAngle.y,  Object.OffsetAngle.r ) )
+	else
+		Ent:SetAngles( Angle(0, ply:EyeAngles().y, 0 ) )
+	end
+
 	Ent:Spawn()
 	Ent:Activate()
 
@@ -322,15 +365,23 @@ function SWEP:PrimaryAttack()
 	end
 end
 
-function SWEP:SelectNextItem()
+function SWEP:SelectNextItem( Prev )
 	if CLIENT then return end
 
 	local objects = self:GetObjectList()
 
-	self:SetNumIndex( self:GetNumIndex() + 1 )
+	if Prev then
+		self:SetNumIndex( self:GetNumIndex() - 1 )
 
-	if self:GetNumIndex() > table.Count( objects ) then
-		self:SetNumIndex( 1 )
+		if self:GetNumIndex() < 1 then
+			self:SetNumIndex( table.Count( objects ) )
+		end
+	else
+		self:SetNumIndex( self:GetNumIndex() + 1 )
+
+		if self:GetNumIndex() > table.Count( objects ) then
+			self:SetNumIndex( 1 )
+		end
 	end
 
 	local desired = self:GetNumIndex()
@@ -348,10 +399,18 @@ function SWEP:SelectNextItem()
 end
 
 function SWEP:SecondaryAttack()
-	self:EmitSound( "Weapon_Pistol.Empty" )
+	local ply = self:GetOwner()
+
+	local Prev = IsValid( ply ) and ply:KeyDown( IN_SPEED )
+
+	if Prev then
+		self:EmitSound( "Weapon_Shotgun.Empty" )
+	else
+		self:EmitSound( "Weapon_Pistol.Empty" )
+	end
 
 	if SERVER then
-		self:SelectNextItem()
+		self:SelectNextItem( Prev )
 	end
 end
 
