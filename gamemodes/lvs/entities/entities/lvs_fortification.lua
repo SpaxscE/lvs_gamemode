@@ -94,7 +94,7 @@ if SERVER then
 		end )
 	end
 
-	ENT.DamageIgnoreType = DMG_SNIPER + DMG_AIRBOAT + DMG_BULLET + DMG_CLUB + DMG_DROWN + DMG_PARALYZE + DMG_NERVEGAS + DMG_POISON + DMG_BURN
+	ENT.DamageIgnoreType = DMG_GENERIC
 
 	function ENT:OnTakeDamage( dmginfo )
 		if self.IsDestroyed then return end
