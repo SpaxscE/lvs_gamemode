@@ -23,30 +23,34 @@ SWEP.SpawnDistance = 512
 
 list.Set("Fortifications", "sandbags", {
 	Name = "Sandbags",
-	Class = "lvs_fortification",
+	Class = "lvs_fortification_playerblocker",
 	Model = "models/props_fortifications/sandbags_line1_tall.mdl",
 	Price = 50,
+	Health = 2000,
 })
 
 list.Set("Fortifications", "hedgehog", {
 	Name = "Hedgehog",
-	Class = "lvs_fortification",
+	Class = "lvs_fortification_vehicleblocker",
 	Model = "models/props_fortifications/hedgehog_small1.mdl",
+	Health = 4000,
 	Price = 100,
 })
 
 list.Set("Fortifications", "dragonsteeth", {
 	Name = "Dragon's teeth",
-	Class = "lvs_fortification",
+	Class = "lvs_fortification_vehicleblocker",
 	Model = "models/diggercars/props/dragonsteeth.mdl",
+	Health = 4000,
 	Price = 75,
 })
 
 list.Set("Fortifications", "wirefence", {
 	Name = "Wire Fence",
-	Class = "lvs_fortification",
+	Class = "lvs_fortification_playerblocker",
 	Model = "models/diggercars/props/wire_test.mdl",
 	Price = 25,
+	Health = 100,
 })
 
 --[[
@@ -269,8 +273,15 @@ function SWEP:PrimaryAttack()
 	Ent:SetAngles( Angle(0, ply:EyeAngles().y, 0 ) )
 	Ent:Spawn()
 	Ent:Activate()
+
 	Ent:SetCreatedBy( ply )
+
 	Ent.ReturnMoney = Object.Price
+
+	if Object.Health and Ent.SetHP and Ent.SetMaxHP then
+		Ent:SetHP( Object.Health )
+		Ent:SetMaxHP( Object.Health )
+	end
 end
 
 function SWEP:SecondaryAttack()
