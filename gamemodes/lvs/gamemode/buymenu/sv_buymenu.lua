@@ -4,8 +4,10 @@ util.AddNetworkString( "lvs_buymenu" )
 net.Receive( "lvs_buymenu", function( len, ply )
 	local class = net.ReadString()
 
-	--TODO: add valid check
-	--TODO: money system
+	if not GAMEMODE:VehicleClassAllowed( class ) then return end
+
+	if not ply:IsAdmin() and GAMEMODE:VehicleClassAdminOnly( class ) then return end
+
 	ply:lvsSetCurrentVehicle( class )
 end )
 
