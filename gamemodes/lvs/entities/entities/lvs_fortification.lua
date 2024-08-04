@@ -170,6 +170,12 @@ if SERVER then
 			timer.Simple( 5, function()
 				if not IsValid( ent ) then return end
 
+				if ent:GetVelocity():LengthSqr() > 1000 then
+					ent:Remove()
+
+					return
+				end
+	
 				ent:SetSolid( SOLID_NONE )
 				ent:PhysicsDestroy()
 			end)
