@@ -48,6 +48,8 @@ if SERVER then
 	function ENT:OnTakeDamage( dmginfo )
 		if self.IsDestroyed then return end
 
+		if not dmginfo:IsDamageType( DMG_BLAST ) then return end
+
 		self:Destroy()
 	end
 
