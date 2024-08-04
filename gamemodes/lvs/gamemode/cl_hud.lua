@@ -71,8 +71,8 @@ end
 local hud = {
 	["CHudHealth"] = true,
 	["CHudBattery"] = true,
-	["CHudAmmo"] = true,
-	["CHudSecondaryAmmo"] = true
+	--["CHudAmmo"] = true,
+	--["CHudSecondaryAmmo"] = true
 }
 
 function GM:HUDShouldDraw( name )

@@ -3,11 +3,12 @@ AddCSLuaFile()
 SWEP.Category				= "[LVS]"
 SWEP.Spawnable			= true
 SWEP.AdminSpawnable		= false
-SWEP.ViewModel			= "models/weapons/c_toolgun.mdl"
-SWEP.WorldModel			= "models/weapons/w_toolgun.mdl"
-SWEP.UseHands				= true
+SWEP.ViewModel = ""
+SWEP.WorldModel = ""
+SWEP.ViewModelFOV = 54
+SWEP.UseHands = true
 
-SWEP.HoldType				= "revolver"
+SWEP.HoldType				= "normal"
 
 SWEP.Primary.ClipSize		= -1
 SWEP.Primary.DefaultClip		= -1
@@ -49,61 +50,34 @@ if CLIENT then
 	SWEP.DrawWeaponInfoBox 	= true
 
 	--SWEP.WepSelectIcon 			= surface.GetTextureID( "weapons/lvsrepair" )
-
-	function SWEP:Think()
-	end
-
-	function SWEP:Deploy()
-		self:SendWeaponAnim( ACT_VM_DEPLOY )
-
-		return true
-	end
-
-	function SWEP:Holster( wep )
-		return true
-	end
-
-	function SWEP:OnRemove()
-	end
-
-	function SWEP:OnDrop()
-	end
-else
-	function SWEP:Think()
-	end
-
-	function SWEP:Deploy()
-		self:SendWeaponAnim( ACT_VM_DEPLOY )
-		return true
-	end
-
-	function SWEP:Holster( wep )
-		return true
-	end
-
-	function SWEP:OnRemove()
-	end
-
-	function SWEP:OnDrop()
-	end
 end
+function SWEP:Think()
 
-function SWEP:Initialize()
-	self:SetHoldType( self.HoldType )
 end
 
 function SWEP:PrimaryAttack()
-	self:SendWeaponAnim( ACT_VM_PRIMARYATTACK )
-
-	local ply = self:GetOwner()
-
-	if not IsValid( ply ) then return end
-
-	ply:SetAnimation( PLAYER_ATTACK1 )
 end
 
 function SWEP:SecondaryAttack()
 end
 
 function SWEP:Reload()
+end
+
+function SWEP:Initialize()
+	self:SetHoldType( self.HoldType )
+end
+
+function SWEP:Deploy()
+	return true
+end
+
+function SWEP:Holster( wep )
+	return true
+end
+
+function SWEP:OnRemove()
+end
+
+function SWEP:OnDrop()
 end

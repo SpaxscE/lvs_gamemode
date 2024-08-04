@@ -325,7 +325,11 @@ function SWEP:PrimaryAttack()
 
 	if not allowed then return end
 
-	if not ply:CanAfford( Object.Price ) then return end
+	if not ply:CanAfford( Object.Price ) then
+		ply:ChatPrint( "You don't have enough money!" )
+
+		return
+	end
 
 	ply:TakeMoney( Object.Price )
 
