@@ -23,6 +23,12 @@ function GM:PlayerInitialSpawn( pl, transiton )
 
 	BaseClass.PlayerInitialSpawn( self, pl, transiton )
 
+	local ConVar = GetConVar( "lvs_start_money" )
+
+	if not ConVar then return end
+
+	pl:AddMoney( ConVar:GetInt() )
+
 end
 
 --F1
