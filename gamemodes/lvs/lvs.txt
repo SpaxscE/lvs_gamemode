@@ -10,6 +10,13 @@
 	{
 		1
 		{
+			"name"		"lvs_start_money"
+			"text"		"start_money"
+			"type"		"Numeric"
+			"default"	"1000"
+		}
+		2
+		{
 			"name"		"mp_falldamage"
 			"text"		"realistic_falldamage"
 			"help"		"Enable realistic fall damage"
