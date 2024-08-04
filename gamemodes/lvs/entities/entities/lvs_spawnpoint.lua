@@ -83,46 +83,71 @@ if CLIENT then
 	local ColFriend = Color(0,127,255,255)
 	local ColEnemy = Color(255,0,0,255)
 
+	local ring = Material( "effects/select_ring" )
 	local mat = Material( "sprites/light_glow02_add" )
-	function ENT:DrawTranslucent()
-		self:DrawModel( flags )
 
-		local pos = self:GetPos()
-		local endpos = self:LocalToWorld( Vector(0,0,14) )
+	function ENT:GetTeamColor()
+		if self:GetAITEAM() ~= LocalPlayer():lvsGetAITeam() then return ColEnemy end
 
-		local Col = self:GetAITEAM() ~= LocalPlayer():lvsGetAITeam() and ColEnemy or ColFriend
-
-		render.SetMaterial( mat )
-		render.DrawSprite( pos, 30, 30, Col )
-		render.DrawSprite( endpos, 100, 100, Col )
+		return ColFriend
 	end
 
-	local RING = Material( "effects/select_ring" )
-	function ENT:Draw()
-		local pos = self:GetPos()
+	function ENT:DrawTranslucent( flags )
+		local Col = self:GetTeamColor()
 
-		local Col = self:GetAITEAM() ~= LocalPlayer():lvsGetAITeam() and ColEnemy or ColFriend
+		local Pos = self:LocalToWorld( Vector(0,0,20) )
 
-		if (self.NextPing or 0) < CurTime() then
-			self.NextPing = CurTime() + 3
-			self.WaveScale = 1
-		end
+		render.SetMaterial( ring )
+		render.DrawSprite( Pos, 24 + math.Rand(-1,1), 24 + math.Rand(-1,1), Col )
 
-		if (self.WaveScale or 0) > 0 then
-			self.WaveScale = math.max( self.WaveScale - FrameTime(), 0 )
-			local InvScale = 1 - self.WaveScale
+		render.SetMaterial( mat )
+		render.DrawSprite( Pos, 100, 100, Col )
+	end
 
-			cam.Start3D2D( self:GetPos() + Vector(0,0,10), self:LocalToWorldAngles( Angle(0,-90,0) ), 1 )
-				surface.SetDrawColor( Col.r, Col.g, Col.b, 255 * self.WaveScale )
-				surface.SetMaterial( RING )
-				surface.DrawTexturedRectRotated( 0, 0, 256 * InvScale, 256 * InvScale, 0 )
-			cam.End3D2D()
-		end
+	function ENT:Draw( flags )
+		self:DrawModel()
 	end
 
 	function ENT:OnRemove()
+		if not self.Snd then return end
+
+		self.Snd:Stop()
+		self.Snd = nil
 	end
 
 	function ENT:Think()
+		local ply = LocalPlayer()
+
+		local Dist = (ply:GetPos() - self:GetPos()):LengthSqr()
+
+		local CloseEnuf = Dist < 100000 and not self.FadingOut
+
+		if CloseEnuf ~= self.CloseEnuf then
+			self.CloseEnuf = CloseEnuf
+
+			if CloseEnuf then
+				if Dist < 1 then
+					self:EmitSound("beams/beamstart5.wav")
+				end
+
+				self.Snd = CreateSound(self, "ambient/levels/citadel/citadel_drone_loop"..math.random(1.6)..".wav")
+				self.Snd:PlayEx(0,50)
+
+				self.Snd:ChangeVolume( 1, 1 )
+			else
+				self.Snd:ChangeVolume( 0, 0.99 )
+
+				self.FadingOut = true
+
+				timer.Simple(1, function()
+					if not IsValid( self ) or not self.Snd then return end
+
+					self.Snd:Stop()
+					self.Snd = nil
+
+					self.FadingOut = nil
+				end)
+			end
+		end
 	end
 end

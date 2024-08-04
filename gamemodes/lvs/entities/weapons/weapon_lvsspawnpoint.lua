@@ -95,6 +95,7 @@ function SWEP:PrimaryAttack()
 	ent:SetCreatedBy( ply )
 
 	ply:ChatPrint("Spawnpoint Set")
+	ply:EmitSound("buttons/lightswitch2.wav")
 
 	ply:SetSpawnPoint( ent )
 end
@@ -112,6 +113,7 @@ function SWEP:Reload()
 
 	if IsValid( oldSpawn ) then
 		ply:ChatPrint("Spawnpoint Removed")
+		ply:EmitSound("buttons/lever7.wav")
 
 		oldSpawn:Remove()
 	end
