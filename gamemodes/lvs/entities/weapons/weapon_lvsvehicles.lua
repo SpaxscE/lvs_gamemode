@@ -179,6 +179,10 @@ if CLIENT then
 		local pos = trace.HitPos + trace.HitNormal
 		local ang = Angle(0,ply:EyeAngles().y - 90,0)
 
+		local CanAfford = ply:CanAfford( ply:lvsGetCurrentVehicleData() )
+
+		if not CanAfford then allowed = false end
+
 		if allowed then
 			surface.SetDrawColor( 0, 127, 255, 255 )
 		else

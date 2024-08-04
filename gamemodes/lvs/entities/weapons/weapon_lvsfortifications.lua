@@ -203,7 +203,7 @@ else
 	
 		local target = trace.Entity
 
-		if not allowed or not IsValid( target ) or not target.IsFortification or target:GetCreatedBy() ~= ply then return end
+		if not IsValid( target ) or not target.IsFortification or target:GetCreatedBy() ~= ply then return end
 
 		if SERVER then
 			if isnumber( target.ReturnMoney ) then
