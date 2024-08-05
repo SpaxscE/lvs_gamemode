@@ -37,7 +37,7 @@ function PLAYER:Loadout()
 
 	self.Player:RemoveAllAmmo()
 
-	self.Player:GiveAmmo( 40, "SniperRound", true )
+	self.Player:GiveAmmo( 4000, "SniperRound", true )
 
 	self.Player:Give( "weapon_lvsantitankgun" )
 	self.Player:Give( "weapon_lvsmines" )
