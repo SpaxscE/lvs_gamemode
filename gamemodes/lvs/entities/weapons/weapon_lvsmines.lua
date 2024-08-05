@@ -1,5 +1,7 @@
 AddCSLuaFile()
 
+SWEP.Base            = "weapon_lvsbasegun"
+
 SWEP.Category				= "[LVS]"
 
 SWEP.Spawnable			= true

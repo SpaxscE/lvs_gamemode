@@ -20,6 +20,14 @@ local function DrawPlayerHud( X, Y, ply )
 	draw.DrawText( Armor, "LVS_FONT_HUD_LARGE", X + 265, Y + 20, ColArmor, TEXT_ALIGN_LEFT )
 end
 
+local function DrawPlayerAmmo( X, Y, ply )
+	local SWEP = ply:GetActiveWeapon()
+
+	if not SWEP.DrawAmmoInfo then return end
+
+	SWEP:DrawAmmoInfo( X, Y, ply )
+end
+
 function GM:PlayerHud( ply )
 	if ply:InVehicle() or not ply:Alive() then return end
 
@@ -54,6 +62,39 @@ function GM:PlayerHud( ply )
 	end
 end
 
+function GM:PlayerAmmo( ply )
+	if ply:InVehicle() or not ply:Alive() then return end
+
+	local editor = LVS.HudEditors["WeaponInfo"]
+
+	if not editor then return end
+
+	local X = ScrW()
+	local Y = ScrH()
+
+	local ScaleX = editor.w / editor.DefaultWidth
+	local ScaleY = editor.h / editor.DefaultHeight
+
+	local PosX = editor.X / ScaleX
+	local PosY = editor.Y / ScaleY
+
+	local Width = editor.w / ScaleX
+	local Height = editor.h / ScaleY
+
+	local ScrW = X / ScaleX
+	local ScrH = Y / ScaleY
+
+	if ScaleX == 1 and ScaleY == 1 then
+		DrawPlayerAmmo( PosX, PosY, ply )
+	else
+		local m = Matrix()
+		m:Scale( Vector( ScaleX, ScaleY, 1 ) )
+
+		cam.PushModelMatrix( m )
+			DrawPlayerAmmo( PosX, PosY, ply )
+		cam.PopModelMatrix()
+	end
+end
 function GM:HUDPaint()
 	local ply = LocalPlayer()
 
@@ -63,16 +104,22 @@ function GM:HUDPaint()
 		self:PlayerHud( ply )
 	end
 
+	if hook.Call( "HUDShouldDraw", self, "LVSHudAmmo" ) then
+		self:PlayerAmmo( ply )
+	end
+
 	if hook.Call( "HUDShouldDraw", self, "LVSHudMoney" ) then
 		self:DrawPlayerMoney( ply )
 	end
+
+	return self.BaseClass.HUDPaint(self)
 end
 
 local hud = {
 	["CHudHealth"] = true,
 	["CHudBattery"] = true,
-	--["CHudAmmo"] = true,
-	--["CHudSecondaryAmmo"] = true
+	["CHudAmmo"] = true,
+	["CHudSecondaryAmmo"] = true
 }
 
 function GM:HUDShouldDraw( name )

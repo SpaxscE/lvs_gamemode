@@ -37,7 +37,7 @@ function PLAYER:Loadout()
 
 	self.Player:RemoveAllAmmo()
 
-	self.Player:GiveAmmo( 4000, "SniperRound", true )
+	self.Player:GiveAmmo( 40, "SniperRound", true )
 
 	self.Player:Give( "weapon_lvsantitankgun" )
 	self.Player:Give( "weapon_lvsmines" )
@@ -85,11 +85,11 @@ function PLAYER:FinishMove( move )
 		forward.p = 0
 		forward = forward:Forward()
 
-		local speedBoostPerc = ( ( not self.Player:Crouching() ) and 0.5 ) or 0.1
+		local speedBoostPerc = ( ( not self.Player:Crouching() ) and 0.25 ) or 0.1
 		local speedAddition = math.abs( move:GetForwardSpeed() * speedBoostPerc )
 		local maxSpeed = move:GetMaxSpeed() * ( 1 + speedBoostPerc )
 		local newSpeed = speedAddition + move:GetVelocity():Length2D()
-		
+
 		if newSpeed > maxSpeed then
 			if move:GetVelocity():Dot(forward) < 0 then -- neu
 				speedAddition = speedAddition - (newSpeed - maxSpeed)

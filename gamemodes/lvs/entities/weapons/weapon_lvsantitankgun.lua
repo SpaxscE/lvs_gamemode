@@ -1,5 +1,7 @@
 AddCSLuaFile()
 
+SWEP.Base            = "weapon_lvsbasegun"
+
 SWEP.Category				= "[LVS]"
 
 SWEP.Spawnable			= true
@@ -20,8 +22,6 @@ SWEP.Secondary.ClipSize		= -1
 SWEP.Secondary.DefaultClip	= -1
 SWEP.Secondary.Automatic		= false
 SWEP.Secondary.Ammo		= "none"
-
-SWEP.DisableBallistics = true
 
 function SWEP:SetupDataTables()
 end
@@ -70,28 +70,22 @@ function SWEP:PrimaryAttack()
 
 	bullet.Dir = (ply:GetEyeTrace().HitPos - bullet.Src):GetNormalized()
 
-	bullet.Spread 	= vector_origin
+	bullet.Spread 	= Vector(0.1,0.1,0.1) * math.min( ply:GetVelocity():Length() / 400, 1 )
 	bullet.TracerName = "lvs_tracer_antitankgun"
 	bullet.Force	= 6000
 	bullet.HullSize 	= 1
-	bullet.Damage	= 100
+	bullet.Damage	= 50
+
+	bullet.SplashDamage = 100
+	bullet.SplashDamageRadius = 25
+	bullet.SplashDamageEffect = "lvs_fortification_explosion_mine"
+	bullet.SplashDamageType = DMG_SONIC
+
 	bullet.Velocity = 4000
 	bullet.Entity = self
 	bullet.Attacker 	= ply
 	bullet.Callback = function(att, tr, dmginfo)
 		dmginfo:SetDamageType( DMG_SNIPER )
-
-		local effectdata = EffectData()
-		effectdata:SetOrigin( tr.HitPos )
-		util.Effect( "lvs_fortification_explosion_mine", effectdata )
-
-		local ent = tr.Entity
-
-		timer.Simple(0, function()
-			if not IsValid( ent ) then return end
-
-			ent:RemoveAllDecals()
-		end)
 	end
 
 	LVS:FireBullet( bullet )
