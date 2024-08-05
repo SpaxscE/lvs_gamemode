@@ -70,4 +70,43 @@ function PLAYER:CalcView( view )
 
 end
 
+local JUMPING
+
+function PLAYER:StartMove( move )
+	if bit.band( move:GetButtons(), IN_JUMP ) ~= 0 and bit.band( move:GetOldButtons(), IN_JUMP ) == 0 and self.Player:OnGround() and not self.Player:InVehicle() then
+		JUMPING = true
+	end
+end
+
+function PLAYER:FinishMove( move )
+
+	if JUMPING then
+		local forward = move:GetAngles()
+		forward.p = 0
+		forward = forward:Forward()
+
+		local speedBoostPerc = ( ( not self.Player:Crouching() ) and 0.5 ) or 0.1
+		local speedAddition = math.abs( move:GetForwardSpeed() * speedBoostPerc )
+		local maxSpeed = move:GetMaxSpeed() * ( 1 + speedBoostPerc )
+		local newSpeed = speedAddition + move:GetVelocity():Length2D()
+		
+		if newSpeed > maxSpeed then
+			if move:GetVelocity():Dot(forward) < 0 then -- neu
+				speedAddition = speedAddition - (newSpeed - maxSpeed)
+			else
+				speedAddition = speedAddition + (newSpeed - maxSpeed) -- neu
+			end
+		end
+
+		if move:GetForwardSpeed() < 0 then
+			speedAddition = -speedAddition
+		end
+
+		move:SetVelocity(forward * speedAddition + move:GetVelocity())
+	end
+
+	JUMPING = nil
+
+end
+
 player_manager.RegisterClass( "player_lvs", PLAYER, "player_default" )
