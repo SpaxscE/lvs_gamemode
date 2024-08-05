@@ -159,8 +159,8 @@ if CLIENT then
 	SWEP.PrintName		= "Fortifications"
 	SWEP.Author			= "Luna"
 
-	SWEP.Slot				= 3
-	SWEP.SlotPos			= 1
+	SWEP.Slot				= 4
+	SWEP.SlotPos			= 2
 
 	SWEP.Purpose			= "Spawn Fortifications"
 	SWEP.Instructions		= "Left Click to Spawn, Right Click to Switch, Reload to Remove"

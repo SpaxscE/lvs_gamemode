@@ -41,8 +41,8 @@ if CLIENT then
 	SWEP.PrintName		= "Spawnpoint"
 	SWEP.Author			= "Luna"
 
-	SWEP.Slot				= 2
-	SWEP.SlotPos			= 1
+	SWEP.Slot				= 4
+	SWEP.SlotPos			= 3
 
 	SWEP.Purpose			= "Set Spawnpoint"
 	SWEP.Instructions		= "Left Click to Set, Right Click to Remove"

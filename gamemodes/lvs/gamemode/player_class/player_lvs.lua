@@ -5,9 +5,9 @@ DEFINE_BASECLASS( "player_default" )
 
 local PLAYER = {}
 
-PLAYER.SlowWalkSpeed		= 100
-PLAYER.WalkSpeed 			= 200
-PLAYER.RunSpeed				= 400
+PLAYER.SlowWalkSpeed		= 75
+PLAYER.WalkSpeed 			= 150
+PLAYER.RunSpeed			= 300
 
 PLAYER.CrouchedWalkSpeed	= 0.3		-- Multiply move speed by this when crouching
 
@@ -37,6 +37,10 @@ function PLAYER:Loadout()
 
 	self.Player:RemoveAllAmmo()
 
+	self.Player:GiveAmmo( 40, "SniperRound", true )
+
+	self.Player:Give( "weapon_lvsantitankgun" )
+	self.Player:Give( "weapon_lvsmines" )
 	self.Player:Give( "weapon_lvsspawnpoint" )
 	self.Player:Give( "weapon_lvsfortifications" )
 	self.Player:Give( "weapon_lvsvehicles" )
