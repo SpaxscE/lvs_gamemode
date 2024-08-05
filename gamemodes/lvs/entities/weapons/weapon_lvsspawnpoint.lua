@@ -91,7 +91,6 @@ function SWEP:PrimaryAttack()
 	ent:SetAngles( Angle(0,ply:EyeAngles().y,0) )
 	ent:Spawn()
 	ent:Activate()
-	ent:SetOwner( ply )
 	ent:SetCreatedBy( ply )
 
 	ply:AddEntityList( ent )

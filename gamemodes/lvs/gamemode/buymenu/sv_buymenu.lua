@@ -137,8 +137,6 @@ function GM:SpawnVehicle( ply, EntityName, tr )
 		entity:SetAITEAM( ply:lvsGetAITeam() )
 	end
 
-	entity:SetRenderMode( RENDERMODE_TRANSALPHA )
-
 	TryFixPropPosition( ply, entity, tr.HitPos )
 
 	return entity

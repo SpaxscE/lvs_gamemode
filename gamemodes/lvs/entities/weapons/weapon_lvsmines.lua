@@ -39,6 +39,8 @@ if CLIENT then
 	SWEP.pViewModel:SetNoDraw( true )
 
 	function SWEP:ViewModelDrawn()
+		if self:Ammo1() <= 0 then return end
+
 		local ply = self:GetOwner()
 
 		if not IsValid( ply ) then return end
@@ -62,6 +64,8 @@ if CLIENT then
 	end
 
 	function SWEP:DrawWorldModel()
+		if self:Ammo1() <= 0 then return end
+
 		local ply = self:GetOwner()
 
 		if not IsValid( ply ) then self:DrawModel() return end
@@ -163,12 +167,6 @@ function SWEP:PrimaryAttack()
 	self:SetNextPrimaryFire( CurTime() + 1.5 )
 
 	self:TakePrimaryAmmo( 1 )
-
-	if SERVER then
-		if self:Ammo1() <= 0 then
-			ply:StripWeapon( "weapon_lvsmines" ) 
-		end
-	end
 end
 
 function SWEP:SecondaryAttack()

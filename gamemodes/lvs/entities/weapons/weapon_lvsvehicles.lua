@@ -260,6 +260,14 @@ function SWEP:PrimaryAttack()
 	ply:ChatPrint( "Vehicle Purchased" )
 end
 
+hook.Add( "LVS.CanPlayerDrive", "!!!prevent_thievery", function(ply, vehicle )
+	if vehicle ~= ply._SpawnedVehicle then
+		ply:ChatPrint( "You can not Drive this vehicle!" )
+
+		return false
+	end
+end )
+
 function SWEP:SecondaryAttack()
 	self:SendWeaponAnim( ACT_SLAM_DETONATOR_DETONATE )
 end

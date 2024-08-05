@@ -21,11 +21,12 @@ end
 
 if SERVER then
 	function ENT:Initialize()	
-		self:SetModel( "models/props_combine/combine_mine01.mdl" )
+		self:SetModel( "models/maxofs2d/hover_plate.mdl" )
 		self:PhysicsInit( SOLID_VPHYSICS )
 		self:SetMoveType( MOVETYPE_VPHYSICS )
 		self:SetSolid( SOLID_VPHYSICS )
 		self:SetCollisionGroup( COLLISION_GROUP_DEBRIS )
+		self:SetUseType( SIMPLE_USE )
 
 		local PObj = self:GetPhysicsObject()
 
@@ -38,6 +39,27 @@ if SERVER then
 		PObj:EnableMotion( false )
 	end
 
+	function ENT:Use( ply )
+		if ply:lvsGetAITeam() ~= self:GetAITEAM() then return end
+
+		local Weapon = ply:GetActiveWeapon()
+
+		if not IsValid( Weapon ) then return end
+
+		local Class = Weapon:GetClass()
+
+		ply:SetSuppressPickupNotices( true )
+
+		ply:StripWeapons()
+		ply:RemoveAllAmmo()
+
+		hook.Call( "PlayerLoadout", GAMEMODE, ply )
+
+		ply:SetSuppressPickupNotices( false )
+
+		ply:SelectWeapon( Class )
+	end
+
 	function ENT:Think()
 		return false
 	end
@@ -46,36 +68,6 @@ if SERVER then
 	end
 
 	function ENT:OnTakeDamage( dmginfo )
-		if self.IsDestroyed then return end
-
-		if not dmginfo:IsDamageType( DMG_BLAST ) then return end
-
-		self:Destroy()
-	end
-
-	function ENT:Explode()
-		local effectdata = EffectData()
-			effectdata:SetOrigin( self:LocalToWorld( self:OBBCenter() ) )
-		util.Effect( "lvs_fortification_explosion", effectdata, true, true )
-
-		if istable( self.BreakSounds ) then
-			self:EmitSound( table.Random( self.BreakSounds ),80,100,1)
-		else
-			if isstring( self.BreakSounds ) then
-				self:EmitSound( self.BreakSounds,80,100,1)
-			end
-		end
-	end
-
-	function ENT:Destroy()
-		if self.IsDestroyed then return end
-
-		self.IsDestroyed = true
-
-		self:Explode()
-		self:SetSolid( SOLID_NONE )
-		self:SetCollisionGroup( COLLISION_GROUP_DEBRIS )
-		SafeRemoveEntityDelayed( self, 0 )
 	end
 end
 
@@ -92,6 +84,8 @@ if CLIENT then
 		return ColFriend
 	end
 
+	local Mat = Material( "lvs/3d2dmats/refil.png" )
+
 	function ENT:DrawTranslucent( flags )
 		local Col = self:GetTeamColor()
 
@@ -102,6 +96,21 @@ if CLIENT then
 
 		render.SetMaterial( mat )
 		render.DrawSprite( Pos, 100, 100, Col )
+
+		local ply = LocalPlayer()
+
+		if not IsValid( ply ) or ply:InVehicle() then return end
+
+		if ply:lvsGetAITeam() ~= self:GetAITEAM() then return end
+
+		for i = 0, 1 do
+			cam.Start3D2D( Pos, self:LocalToWorldAngles( Angle(0,180 * i + CurTime() * 100,90) ), 0.2 )
+				surface.SetDrawColor( color_white )
+
+				surface.SetMaterial( Mat )
+				surface.DrawTexturedRect( -100, -100, 200, 200 )
+			cam.End3D2D()
+		end
 	end
 
 	function ENT:Draw( flags )

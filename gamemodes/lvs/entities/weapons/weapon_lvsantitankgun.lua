@@ -32,6 +32,37 @@ if CLIENT then
 
 	SWEP.Slot				= 3
 	SWEP.SlotPos			= 1
+
+	function SWEP:DrawWeaponSelection( x, y, wide, tall, alpha )
+		draw.SimpleText( "i", "WeaponIcons", x + wide/2, y + tall*0.2, Color( 255, 210, 0, 255 ), TEXT_ALIGN_CENTER )
+	end
+
+	function SWEP:SetWeaponHoldType( t )
+		t = string.lower( t )
+
+		local index = ACT_HL2MP_IDLE_RPG
+
+		self.ActivityTranslate = {}
+		self.ActivityTranslate[ ACT_MP_STAND_IDLE ]					= index
+		self.ActivityTranslate[ ACT_MP_WALK ]						= index + 1
+		self.ActivityTranslate[ ACT_MP_RUN ]						= index + 2
+		self.ActivityTranslate[ ACT_MP_CROUCH_IDLE ]				= index + 3
+		self.ActivityTranslate[ ACT_MP_CROUCHWALK ]					= index + 4
+		self.ActivityTranslate[ ACT_MP_ATTACK_STAND_PRIMARYFIRE ]	= index + 5
+		self.ActivityTranslate[ ACT_MP_ATTACK_CROUCH_PRIMARYFIRE ]	= index + 5
+		
+		if t == "rpg" then
+			self.ActivityTranslate[ ACT_MP_RELOAD_STAND ]				= ACT_HL2MP_IDLE_PISTOL + 6
+			self.ActivityTranslate[ ACT_MP_RELOAD_CROUCH ]				= ACT_HL2MP_IDLE_PISTOL + 6
+		end
+		
+		self.ActivityTranslate[ ACT_MP_JUMP ]						= index + 7
+		self.ActivityTranslate[ ACT_RANGE_ATTACK1 ]					= index + 8
+		self.ActivityTranslate[ ACT_MP_SWIM ]						= index + 9
+
+		self:SetupWeaponHoldTypeForAI( t )
+
+	end
 end
 
 function SWEP:Initialize()
