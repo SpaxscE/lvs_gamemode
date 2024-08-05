@@ -112,7 +112,8 @@ function GM:HUDPaint()
 		self:DrawPlayerMoney( ply )
 	end
 
-	return self.BaseClass.HUDPaint(self)
+	hook.Run( "HUDDrawTargetID" )
+	hook.Run( "HUDDrawPickupHistory" )
 end
 
 local hud = {
