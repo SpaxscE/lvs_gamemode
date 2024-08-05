@@ -1,24 +1,27 @@
 
-local meta = FindMetaTable( "Player" )
-
-function meta:AddEntityList( ent )
-	if not istable( self._EntList ) then
-		self._EntList = {}
+function GM:DoPlayerDeath( ply, attacker, dmginfo )
+	if not dmginfo:IsDamageType( DMG_REMOVENORAGDOLL ) then
+		ply:CreateRagdoll()
 	end
 
-	table.insert( self._EntList, ent )
+	ply:AddDeaths( 1 )
+
+	if attacker:IsValid() and attacker:IsPlayer() then
+
+		if attacker == ply then
+			attacker:AddFrags( -1 )
+		else
+			attacker:AddFrags( 1 )
+		end
+
+	end
 end
 
-function meta:GetEntityList()
-	if not istable( self._EntList ) then return {} end
+function GM:PlayerDeathSound( ply )
+	return true
+end
 
-	for id, ent in pairs( self._EntList ) do
-		if IsValid( ent ) then continue end
-
-		self._EntList[ id ] = nil
-	end
-
-	return self._EntList
+function GM:OnDamagedByExplosion( ply, dmginfo )
 end
 
 function GM:CanPlayerSuicide( ply )
@@ -26,9 +29,7 @@ function GM:CanPlayerSuicide( ply )
 end
 
 function GM:PlayerDisconnected( ply )
-	for _, ent in pairs( ply:GetEntityList() ) do
-		ent:Remove()
-	end
+	ply:ClearEntityList()
 end
 
 function GM:PlayerSpawn( ply, transiton )
@@ -59,9 +60,20 @@ end
 
 function GM:PlayerInitialSpawn( ply, transiton )
 
-	ply:lvsSetAITeam( 0 )
-	ply:SetTeam( TEAM_SPECTATOR )
-	ply:SendLua( "GAMEMODE:OpenJoinMenu()" )
+	local NumTeam1 = #self:GetPlayersTeam1()
+	local NumTeam2 = #self:GetPlayersTeam2()
+
+	ply:SetTeam( TEAM_UNASSIGNED )
+
+	if NumTeam1 == NumTeam2 then
+		ply:lvsSetAITeam( math.random(1,2) )
+	else
+		if NumTeam1 < NumTeam2 then
+			ply:lvsSetAITeam( 1 )
+		else
+			ply:lvsSetAITeam( 2 )
+		end
+	end
 
 	local ConVar = GetConVar( "lvs_start_money" )
 
@@ -121,6 +133,7 @@ function GM:PlayerJoinTeam( ply, teamid )
 	end
 
 	if teamid == TEAM_SPECTATOR then
+		ply:ClearEntityList()
 		ply:SetTeam( TEAM_SPECTATOR )
 		ply:lvsSetAITeam( 0 )
 	else

@@ -1,5 +1,6 @@
 include( "shared.lua" )
 include( "player.lua" )
+include( "player_extension.lua" )
 include( "buymenu/sv_buymenu.lua" )
 include( "sv_spawnpoint.lua" )
 AddCSLuaFile( "cl_init.lua" )
