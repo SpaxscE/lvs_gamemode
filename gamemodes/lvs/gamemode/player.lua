@@ -1,6 +1,34 @@
 
+local meta = FindMetaTable( "Player" )
+
+function meta:AddEntityList( ent )
+	if not istable( self._EntList ) then
+		self._EntList = {}
+	end
+
+	table.insert( self._EntList, ent )
+end
+
+function meta:GetEntityList()
+	if not istable( self._EntList ) then return {} end
+
+	for id, ent in pairs( self._EntList ) do
+		if IsValid( ent ) then continue end
+
+		self._EntList[ id ] = nil
+	end
+
+	return self._EntList
+end
+
 function GM:CanPlayerSuicide( ply )
 	return ply:Team() ~= TEAM_SPECTATOR
+end
+
+function GM:PlayerDisconnected( ply )
+	for _, ent in pairs( ply:GetEntityList() ) do
+		ent:Remove()
+	end
 end
 
 function GM:PlayerSpawn( ply, transiton )

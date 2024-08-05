@@ -140,6 +140,8 @@ function SWEP:ThrowMine()
 	ent:Activate()
 	ent:SetAttacker( ply )
 
+	ply:AddEntityList( ent )
+
 	local PhysObj = ent:GetPhysicsObject()
 
 	if not IsValid( PhysObj ) then return end

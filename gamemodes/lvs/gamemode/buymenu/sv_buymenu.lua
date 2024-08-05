@@ -131,6 +131,8 @@ function GM:SpawnVehicle( ply, EntityName, tr )
 
 	if not IsValid( entity ) then return end
 
+	ply:AddEntityList( entity )
+
 	if entity.SetAITEAM then
 		entity:SetAITEAM( ply:lvsGetAITeam() )
 	end

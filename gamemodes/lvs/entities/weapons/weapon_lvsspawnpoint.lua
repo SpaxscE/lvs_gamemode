@@ -94,6 +94,8 @@ function SWEP:PrimaryAttack()
 	ent:SetOwner( ply )
 	ent:SetCreatedBy( ply )
 
+	ply:AddEntityList( ent )
+
 	ply:ChatPrint("Spawnpoint Set")
 	ply:EmitSound("buttons/lightswitch2.wav")
 

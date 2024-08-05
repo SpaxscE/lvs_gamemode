@@ -355,6 +355,8 @@ function SWEP:PrimaryAttack()
 
 	Ent.ReturnMoney = Object.Price
 
+	ply:AddEntityList( Ent )
+
 	if Object.GibModels then
 		Ent.GibModels = Object.GibModels
 	end
