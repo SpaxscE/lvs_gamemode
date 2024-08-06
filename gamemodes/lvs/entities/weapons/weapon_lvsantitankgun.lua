@@ -76,7 +76,7 @@ end
 function SWEP:PrimaryAttack()
 	if not self:CanPrimaryAttack() then return end
 
-	self:SetNextPrimaryFire( CurTime() + 1.5 )
+	self:SetNextPrimaryFire( CurTime() + 1 )
 
 	self:TakePrimaryAmmo( 1 )
 

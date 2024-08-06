@@ -1,6 +1,23 @@
 
 local meta = FindMetaTable( "Player" )
 
+function meta:CreateGibs( dmginfo )
+	local ent = ents.Create( "lvs_player_explosion" )
+
+	if not IsValid( ent ) then return end
+
+	ent:SetPos( self:GetPos() )
+	ent:SetAngles( self:GetAngles() )
+	ent:SetHull( self:GetHull() )
+
+	if dmginfo then
+		ent:SetForce( dmginfo:GetDamageForce() * 0.001 + self:GetVelocity() )
+	end
+
+	ent:Spawn()
+	ent:Activate()
+end
+
 function meta:ClearEntityList()
 	for _, ent in pairs( ply:GetEntityList() ) do
 		ent:Remove()
