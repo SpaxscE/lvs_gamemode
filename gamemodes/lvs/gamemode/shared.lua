@@ -9,6 +9,7 @@ include( "player_class/player_lvs.lua" )
 include( "sh_moneysystem.lua" )
 include( "sh_vehicles.lua" )
 include( "sh_spectator.lua" )
+include( "sh_playerragdoll.lua" )
 
 function GM:Initialize()
 	LVS.HudForceDefault = true

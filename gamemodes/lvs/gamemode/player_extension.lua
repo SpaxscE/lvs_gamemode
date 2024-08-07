@@ -9,9 +9,11 @@ function meta:CreateGibs( dmginfo )
 	ent:SetPos( self:GetPos() )
 	ent:SetAngles( self:GetAngles() )
 	ent:SetHull( self:GetHull() )
+	ent:SetOwner( self )
 
 	if dmginfo then
 		ent:SetForce( dmginfo:GetDamageForce() * 0.001 + self:GetVelocity() )
+		ent:SetDissolve( dmginfo:IsDamageType( DMG_DISSOLVE ) )
 	end
 
 	ent:Spawn()

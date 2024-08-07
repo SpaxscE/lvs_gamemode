@@ -4,7 +4,7 @@ function GM:DoPlayerDeath( ply, attacker, dmginfo )
 		if dmginfo:IsDamageType( DMG_BLAST ) or dmginfo:GetDamageForce():Length() > 10000 then
 			ply:CreateGibs( dmginfo )
 		else
-			ply:CreateRagdoll()
+			ply:CreateRagdollSV( dmginfo )
 		end
 	end
 
@@ -34,9 +34,13 @@ end
 
 function GM:PlayerDisconnected( ply )
 	ply:ClearEntityList()
+
+	ply:RemoveRagdollSV()
 end
 
 function GM:PlayerSpawn( ply, transiton )
+
+	ply:RemoveRagdollSV()
 
 	if ply:Team() == TEAM_SPECTATOR then
 

@@ -14,6 +14,14 @@ for _, modelName in ipairs( gibs ) do
 end
 
 if SERVER then
+	function ENT:SetDissolve( shoulddissolve )
+		self._Dissolve = shoulddissolve
+	end
+
+	function ENT:GetDissolve()
+		return self._Dissolve == true
+	end
+
 	function ENT:SetHull( Mins, Maxs )
 		self._Mins = Mins
 		self._Maxs = Maxs
@@ -66,6 +74,7 @@ if SERVER then
 		self:EmitSound("physics/flesh/flesh_bloody_break.wav", 85)
 
 		local AllEnts = ents.GetAll()
+		local ShouldDissolve = self:GetDissolve()
 
 		for i = 1, 20 do
 			timer.Simple( math.Rand(0,0.2), function()
@@ -96,12 +105,42 @@ if SERVER then
 			ent:Spawn()
 			ent:Activate()
 
+			if v == "models/Gibs/HGIBS.mdl" then
+				local ply = self:GetOwner()
+				if IsValid( ply ) then
+					ply:Spectate( OBS_MODE_CHASE )
+					ply:SpectateEntity( ent )
+				end
+			end
+
 			local PhysObj = ent:GetPhysicsObject()
 
 			if IsValid( PhysObj ) then
-				PhysObj:SetVelocityInstantaneous( VectorRand() * 100 + Force )
-				PhysObj:AddAngleVelocity( VectorRand() * 500 ) 
-				PhysObj:EnableDrag( false ) 
+				if ShouldDissolve then
+					PhysObj:EnableGravity( false ) 
+					PhysObj:SetVelocity( VectorRand() * 400 )
+
+					local dissolver = ents.Create("env_entity_dissolver")
+					dissolver:SetMoveParent( ent )
+					dissolver:SetSaveValue("m_flStartTime",0 )
+					dissolver:Spawn()
+					dissolver:AddEFlags( EFL_FORCE_CHECK_TRANSMIT )
+
+					ent:SetSaveValue("m_flDissolveStartTime", 0 )
+					ent:SetSaveValue("m_hEffectEntity", dissolver )
+					ent:AddFlags( FL_DISSOLVING )
+
+					timer.Simple(0.1, function()
+						if not IsValid( PhysObj ) then return end
+
+						PhysObj:SetDragCoefficient( 400 )
+					end)
+				else
+					PhysObj:SetVelocityInstantaneous( VectorRand() * 100 + Force )
+					PhysObj:AddAngleVelocity( VectorRand() * 500 ) 
+					PhysObj:EnableDrag( false ) 
+				end
+
 			end
 
 			timer.Simple( 4.5 + math.Rand(0,0.5), function()
