@@ -1,7 +1,7 @@
 
 function GM:DoPlayerDeath( ply, attacker, dmginfo )
 	if not dmginfo:IsDamageType( DMG_REMOVENORAGDOLL ) then
-		if dmginfo:IsDamageType( DMG_BLAST ) or dmginfo:GetDamageForce():Length() > 10000 then
+		if dmginfo:IsDamageType( DMG_BLAST ) or dmginfo:GetDamageForce():Length() > 10000 or dmginfo:IsDamageType( DMG_ALWAYSGIB ) then
 			ply:CreateGibs( dmginfo )
 		else
 			ply:CreateRagdollSV( dmginfo )

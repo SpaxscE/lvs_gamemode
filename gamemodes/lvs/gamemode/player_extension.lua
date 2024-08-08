@@ -2,6 +2,12 @@
 local meta = FindMetaTable( "Player" )
 
 function meta:CreateGibs( dmginfo )
+	local ragdoll = self:GetRagdollSV()
+
+	if IsValid( ragdoll ) then
+		ragdoll:Remove()
+	end
+
 	local ent = ents.Create( "lvs_player_explosion" )
 
 	if not IsValid( ent ) then return end
@@ -21,7 +27,7 @@ function meta:CreateGibs( dmginfo )
 end
 
 function meta:ClearEntityList()
-	for _, ent in pairs( ply:GetEntityList() ) do
+	for _, ent in pairs( self:GetEntityList() ) do
 		ent:Remove()
 	end
 
